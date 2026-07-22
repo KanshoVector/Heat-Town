@@ -1,38 +1,33 @@
-# ソースコード
+# ソースコード（`src/`）
 
-Python 分析パイプライン。意思決定モデルは `heat_town.model` に実装。
+**式 \(J_i\) を計算して GeoJSON を出す人** が触る。
 
-## 構成
+\[
+J_i = w_1 \cdot d_i + w_2 \cdot (100 - C_i) + w_3 \cdot \text{WBGT}_i
+\]
 
-```
-src/heat_town/
-├── __init__.py
-└── model.py          # Ji 計算・寄与分解・重み正規化
-```
+低い \(J_i\) = より望ましい地点。`model.py` に実装済み。
 
-| モジュール | 責務 | ドキュメント |
-|------------|------|--------------|
-| `model.py` | \(J_i\), contributions | [decision-model.md](../docs/decision-model.md) |
-
-## ローカル開発
+## 最初の 3 ステップ
 
 ```bash
-pip install -r requirements.txt
-pip install -e ".[dev]"
-ruff check src tests
-pytest
+source .venv/bin/activate          # 未作成なら START.md
+python -c "from heat_town.model import compute_ji; print('OK')"
+# 担当に応じて cli / preprocess / export を実装（下表）
 ```
 
-## テスト
+## ファイルと作業
 
-`tests/test_model.py` — \(J_i\) 計算、重み正規化、寄与分解。
+| ファイル | やること |
+|----------|----------|
+| `heat_town/model.py` | \(J_i\) 計算・寄与分解（済） |
+| `cli.py`（未実装） | `fetch-weather`, `pipeline --sample` など |
+| `preprocess.py`（未実装） | parquet 整形 |
+| `export.py`（未実装） | `mvp/public/data/scores.geojson` 出力 |
 
-CI: [.github/workflows/python.yml](../.github/workflows/python.yml)
+データ取得の詳細は [data/README.md](../data/README.md)。
 
-## 今後追加（並列開発）
+## 完了の目安
 
-| モジュール | 担当 | doc |
-|------------|------|-----|
-| `cli.py` | Data | [data.md](../docs/data.md) |
-| `preprocess.py` | Data | [data.md](../docs/data.md) |
-| `export.py` | Model/Viz | [analysis.md](../docs/analysis.md) |
+- `features.parquet` を読んで `scores.geojson` が出る
+- 地図担当が [mvp/README.md](../mvp/README.md) で表示できる

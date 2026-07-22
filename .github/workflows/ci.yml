@@ -1,21 +1,22 @@
+# 任意。学生は気にしなくて OK（手動実行のみ）。
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   docs:
     uses: ./.github/workflows/docs.yml
+    continue-on-error: true
 
   python:
     uses: ./.github/workflows/python.yml
+    continue-on-error: true
 
   build:
     runs-on: ubuntu-latest
     if: hashFiles('mvp/next.config.js', 'mvp/next.config.mjs', 'mvp/next.config.ts') != ''
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

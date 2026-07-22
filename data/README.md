@@ -1,45 +1,48 @@
-# データカタログ
+# データ（`data/`）
 
-## ディレクトリ構成
+**外部データを取って parquet / geojson に整える人** が触る。
+
+## 最初の 3 ステップ
+
+```bash
+source .venv/bin/activate
+ls data/samples/weather data/samples/poi data/samples/grid
+# cli 実装前は samples/ をそのまま使って OK
+```
+
+## データの出どころ
+
+| データ | 取得元 | 置き場 |
+|--------|--------|--------|
+| 気象・WBGT 推定 | Open-Meteo API | `samples/weather/` |
+| POI（緑・日陰） | OSM Overpass | `samples/poi/` |
+| 評価グリッド | 内部生成 | `samples/grid/` |
+
+対象エリア: **大学近傍 2km 四方**（`config/area.yaml` 参照）。  
+WBGT は気象から **推定** した値（公式観測ではない）。
+
+## ディレクトリ
 
 ```
 data/
-├── README.md          # 本ファイル
-├── samples/           # Git 管理 — CI / デモ用最小セット
-│   ├── weather/
-│   ├── poi/
-│   └── grid/
-├── raw/               # .gitignore — フル取得データ
-│   ├── weather/
-│   ├── poi/
-│   └── grid/
-└── processed/         # パイプライン出力
-    ├── preprocessed.parquet
-    └── features.parquet
+├── samples/      # Git 管理 — 最初はここだけ触る
+├── raw/          # .gitignore — フル取得用
+└── processed/    # パイプライン出力 → features.parquet
 ```
 
-## ファイル一覧と由来
-
-| ファイル | 由来 | 更新頻度 |
-|----------|------|----------|
-| `samples/weather/*.parquet` | Open-Meteo（sample 日付） | 手動 |
-| `samples/poi/*.geojson` | OSM Overpass（sample bbox） | 手動 |
-| `samples/grid/points.parquet` | 内部生成 | 手動 |
-| `processed/features.parquet` | `src/cli pipeline` | パイプライン実行時 |
-
-## 再取得手順
+## パイプライン（cli 実装後）
 
 ```bash
-# フル取得（対象 bbox は config/area.yaml）
 python -m src.cli fetch-weather --full
 python -m src.cli fetch-poi --full
 python -m src.cli build-grid
-
-# sample のみ（CI 同等）
-python -m src.cli pipeline --sample
+python -m src.cli pipeline --sample   # samples のみ
 ```
 
-詳細: [docs/data.md](../docs/data.md)
+## 完了の目安
+
+- `data/processed/features.parquet` がある（または samples で分析が回る）
+- 下表のライセンス帰属を守っている
 
 ## ライセンス
 
@@ -47,6 +50,4 @@ python -m src.cli pipeline --sample
 |--------|------------|------|
 | Open-Meteo | [API Terms](https://open-meteo.com/en/terms) | Open-Meteo |
 | OpenStreetMap | ODbL 1.0 | © OpenStreetMap contributors |
-| 生成データ（grid, features） | MIT（本 repo） | heat-town |
-
-**注意**: WBGT は Open-Meteo 気象から **推定** した値であり、公式観測ではない。
+| 生成データ | MIT（本 repo） | heat-town |
