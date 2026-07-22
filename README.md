@@ -1,13 +1,12 @@
 # heat-town — 都市熱環境における意思決定支援モデル
 
-[![CI](https://github.com/KanshoVector/Heat-Town/actions/workflows/ci.yml/badge.svg)](https://github.com/KanshoVector/Heat-Town/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Overview
 
-**heat-town** は、オープンデータと説明可能な多目的評価モデル \(J_i\) により、都市熱環境における意思決定を支援する大学データサイエンス PBL 向け OSS プロジェクトである。2〜3 日・6 人で完遂可能なスコープで、GitHub 公開品質の doc と PoC を成果とする。
+**heat-town** は、オープンデータと説明可能な多目的評価モデル \(J_i\) により、都市熱環境における意思決定を支援する大学データサイエンス PBL 向け OSS プロジェクトである。2〜3 日・6 人で完遂可能なスコープ。
 
-> Web アプリ開発ではない。主役は **社会課題 → データ → 分析 → 提言**。MVP は分析結果を体験する PoC。
+> **初めての人 → [START.md](START.md)（1 分）**  Web アプリ開発ではない。主役は **社会課題 → データ → 分析 → 提言**。MVP は分析結果を体験する PoC。
 
 ## Social Challenge
 
@@ -34,11 +33,10 @@ flowchart LR
     OD[Open Data] --> PY[Python Pipeline]
     PY --> GEO[GeoJSON]
     GEO --> POC[Leaflet PoC]
-    PY --> CI[GitHub Actions]
-    POC --> VER[Vercel CD]
+    POC --> VER[Vercel]
 ```
 
-Serverless First: DuckDB + 静的 PoC。CD は Vercel GitHub 連携のみ（Actions から deploy しない）。
+DuckDB + 静的 PoC。デプロイは Vercel GitHub 連携。
 
 ## Quick Start
 
@@ -48,55 +46,22 @@ cd Heat-Town
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pip install -e ".[dev]"
-pytest
 cd mvp/public && python -m http.server 8080
 ```
 
-## Documents
+## はじめ方
 
-| ドキュメント | 内容 |
-|--------------|------|
-| [docs/00-project/overview.md](docs/00-project/overview.md) | **最初に読む** |
-| [docs/GLOSSARY.md](docs/GLOSSARY.md) | 用語集 |
-| [docs/README.md](docs/README.md) | 全 doc ナビ |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | 開発ガイド |
+**[START.md](START.md)** → 担当フォルダの README だけ読んで着手。`docs/` は設計済みの参考（読む必要なし）。
 
 ## Repository Structure
 
 ```
 heat-town/
-├── docs/                 # プロジェクト doc（フラット構成）
-│   ├── 00-project/       # overview のみ
-│   ├── GLOSSARY.md
-│   └── *.md              # 社会課題〜運用
-├── src/heat_town/        # Python 分析
-├── data/                 # データカタログ
-├── notebooks/            # 分析 notebook
-├── mvp/                  # PoC ビューア
-└── .github/workflows/    # CI（品質保証）
+├── START.md              # 入口（1 分）
+├── data/ notebooks/ src/ mvp/   # 各 README が作業手順
+├── docs/                 # 設計参考（熟読不要）
+└── .github/workflows/    # 発起人が手動実行するだけ
 ```
-
-## Team
-
-| 役割 | 人数 |
-|------|------|
-| PM | 1 |
-| Data | 1 |
-| Analysis | 2 |
-| Model / Viz | 1 |
-| MVP / DevOps | 1 |
-
-詳細: [docs/00-project/overview.md](docs/00-project/overview.md)
-
-## Quality Assurance
-
-| バッジ | 内容 |
-|--------|------|
-| [![CI](https://github.com/KanshoVector/Heat-Town/actions/workflows/ci.yml/badge.svg)](https://github.com/KanshoVector/Heat-Town/actions/workflows/ci.yml) | PR ゲート: Markdown Lint, ruff, pytest |
-
-Build Status: [GitHub Actions](https://github.com/KanshoVector/Heat-Town/actions) — `ci.yml` が main の必須チェック。
-
-Branch Protection: main は PR 必須・Status Check 必須・Review 1 名以上（[operations.md](docs/operations.md)）。
 
 ## License
 

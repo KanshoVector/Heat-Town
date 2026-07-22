@@ -49,15 +49,16 @@ AI 利用は付録で開示。チーム doc の丸写し禁止。
 
 ## チームワークフロー
 
-### 6 人役割
+### 分担（参考）
 
-| 役割 | 担当 |
-|------|------|
-| PM | overview, 発表 |
-| Data | [data.md](data.md) |
-| Analysis ×2 | [analysis.md](analysis.md), notebooks |
-| Model/Viz | [decision-model.md](decision-model.md), export |
-| MVP/DevOps | [mvp.md](mvp.md), CI, Vercel |
+| ブロック | フォルダ |
+|----------|----------|
+| データ | [data.md](data.md), `data/`, `src/` |
+| 分析 ×2 | [analysis.md](analysis.md), `notebooks/` |
+| モデル出力 | [decision-model.md](decision-model.md), `src/` |
+| 地図 | [mvp.md](mvp.md), `mvp/` |
+
+発表は発起人。詳細: [START.md](../START.md)
 
 ### 2〜3 日スケジュール
 
@@ -69,11 +70,9 @@ AI 利用は付録で開示。チーム doc の丸写し禁止。
 
 ### 成果物チェックリスト
 
-- [ ] doc 用語・記号統一（[GLOSSARY.md](GLOSSARY.md)）
-- [ ] `pytest` / CI 緑
-- [ ] PoC 寄与 popup
+- [ ] 各フォルダ README の「完了の目安」を満たしている
+- [ ] PoC で地図 + 寄与 popup が動く
 - [ ] Vercel URL
-- [ ] 7 分リハ 420 秒以内
-- [ ] 個人レポート 6 本
+- [ ] 個人レポート
 
-コミュニケーション: GitHub Issues / PR（review 1 名以上）
+コミュニケーション: GitHub Issues / PR

@@ -1,29 +1,31 @@
-# MVP（PoC）
+# 地図 PoC（`mvp/`）
 
-分析結果を体験する静的ビューア。仕様: [docs/mvp.md](../docs/mvp.md)
+**分析結果を Leaflet で見せる人** が触る。HTML + 静的 GeoJSON だけ。
+
+## 最初の 3 ステップ
+
+```bash
+cd mvp/public && python -m http.server 8080
+# http://localhost:8080 を開く
+# data/scores.geojson を置き、地図に点が出るか確認
+```
 
 ## 構成
 
 ```
-mvp/
-├── public/
-│   ├── index.html      # HTML+JS（デフォルト）
-│   ├── js/
-│   └── data/scores.geojson
-└── package.json        # Next.js 採用時のみ
+mvp/public/
+├── index.html
+├── js/
+└── data/scores.geojson   ← src/export の出力
 ```
 
-## ローカル起動
+## 最低限やること
 
-```bash
-cd mvp/public && python -m http.server 8080
-# Next.js 採用時: cd mvp && npm install && npm run dev
-```
+1. GeoJSON を読み込んで地図に色分け表示
+2. 地点クリック → popup に **寄与 3 行**（距離 / 不快 / 暑さ）
+3. （余裕があれば）重みスライダー・`elderly` プリセット
 
-## デプロイ
+## 完了の目安
 
-Vercel GitHub 連携（Actions から deploy しない）— [docs/operations.md](../docs/operations.md)
-
-## CI Build Check
-
-`mvp/next.config.js` を追加すると CI が `npm run build` を実行する。
+- ローカルで地図 + popup が動く
+- main merge 後、Vercel URL が開く（連携は発起人）

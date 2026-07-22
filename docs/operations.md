@@ -1,6 +1,6 @@
-# 運用・技術・品質保証
+# 運用・技術（発起人用）
 
-設計思想、再現性、デプロイ、CI/CD を統合する。
+学生向け手順は各フォルダ README + [START.md](../START.md)。本ファイルは発起人・教員向け。
 
 ---
 
@@ -14,7 +14,7 @@
 | Serverless First | DuckDB ファイル、静的 PoC |
 | MVP First | PoC のみ |
 | Explainability First | 線形 \(J_i\) + 寄与 UI |
-| Reproducibility First | Parquet, Actions, seed 42 |
+| Reproducibility First | Parquet, seed 42 |
 
 ## 技術スタック
 
@@ -24,7 +24,6 @@
 | 気象 | Open-Meteo REST |
 | 地図 | Leaflet |
 | フロント | Next.js **または** HTML+JS |
-| CI | GitHub Actions |
 | ホスト | Vercel（GitHub 連携） |
 
 ---
@@ -37,7 +36,6 @@ cd Heat-Town
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pip install -e ".[dev]"
-pytest
 ```
 
 | パス | Git |
@@ -67,46 +65,17 @@ cd mvp/public && python -m http.server 8080  # HTML+JS
 
 ---
 
-## CI/CD（大学 PBL 最小構成）
+## CI（任意・手動のみ）
 
-### 目的
+**学生は pytest / ruff / CI を気にしない。** 動けば正義。
 
-**品質保証**。デプロイは目的ではない。
-
-### ワークフロー
-
-| ファイル | 役割 |
+| ファイル | 内容 |
 |----------|------|
-| `.github/workflows/ci.yml` | PR ゲート（docs + python + build） |
-| `.github/workflows/docs.yml` | Markdown Lint |
-| `.github/workflows/python.yml` | ruff + pytest + requirements install |
+| `ci.yml` | `workflow_dispatch` のみ。PR を止めない |
+| `docs.yml` | Markdown Lint |
+| `python.yml` | ruff + pytest |
 
-```mermaid
-flowchart LR
-    PR[Pull Request] --> CI[ci.yml]
-    CI --> MD[docs.yml Markdown Lint]
-    CI --> PY[python.yml ruff pytest]
-    CI --> BD[Next.js Build 採用時のみ]
-    MERGE[merge main] --> VER[Vercel CD]
-```
-
-### PR 時チェック
-
-- Markdown Lint
-- ruff（Python）
-- pytest
-- requirements install 検証
-- Next.js build（`mvp/next.config.js` 存在時のみ）
-
-### Branch Protection（main）
-
-GitHub Settings → Branches で設定:
-
-| ルール | 設定 |
-|--------|------|
-| PR 必須 | ✅ |
-| Status Check 必須 | `ci`（または docs + python） |
-| Review | 1 名以上 |
+GitHub Actions タブから手動実行。Branch Protection に Status Check は **設定しない**（PR が止まるため）。
 
 ---
 
