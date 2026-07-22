@@ -1,0 +1,71 @@
+# Python — 仮想環境・ビルド成果物は共有しない（各自 .venv を作成）
+.venv/
+venv/
+env/
+.env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# テスト・Lint キャッシュ
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# 秘密情報 — 絶対に commit しない
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
+
+# データ — raw / 大容量 processed は除外（samples のみ共有）
+data/raw/
+data/processed/*
+!data/processed/.gitkeep
+data/samples/*
+!data/samples/.gitkeep
+
+# Node / フロント
+node_modules/
+mvp/.next/
+mvp/out/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Jupyter
+.ipynb_checkpoints/
+profile_default/
+
+# レポート生成物（notebook 出力）
+reports/
+
+# IDE / エディタ
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ロックファイル方針: requirements.txt + pyproject.toml を SSoT
+# uv / poetry は個人環境のみ（チーム衝突防止）
+uv.lock
+poetry.lock
+Pipfile.lock

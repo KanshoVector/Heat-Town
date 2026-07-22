@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  docs:
+    uses: ./.github/workflows/docs.yml
+
+  python:
+    uses: ./.github/workflows/python.yml
+
+  build:
+    runs-on: ubuntu-latest
+    if: hashFiles('mvp/next.config.js', 'mvp/next.config.mjs', 'mvp/next.config.ts') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: mvp/package-lock.json
+      - name: Install and build
+        working-directory: mvp
+        run: |
+          npm ci
+          npm run build
