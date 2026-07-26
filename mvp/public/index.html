@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heat-Town — 都市熱リスク可視化 PoC</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: system-ui, sans-serif;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+        }
+
+        #map {
+            flex: 1 1 70%;
+        }
+
+        #sidebar {
+            flex: 0 0 320px;
+            padding: 20px;
+            background: #2b2118;
+            color: #fff;
+            overflow-y: auto;
+        }
+
+        #sidebar h1 {
+            font-size: 20px;
+            color: #ffb03b;
+            margin-bottom: 4px;
+        }
+
+        #sidebar .sub {
+            font-size: 12px;
+            color: #c9a;
+            margin-bottom: 20px;
+        }
+
+        .control {
+            margin-bottom: 22px;
+        }
+
+        .control label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #ffb03b;
+        }
+
+        .control input[type="range"] {
+            width: 100%;
+        }
+
+        .val {
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .presets button {
+            display: inline-block;
+            margin: 3px;
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #f4813f;
+            background: transparent;
+            color: #f4813f;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .presets button:hover,
+        .presets button.active {
+            background: #f4813f;
+            color: #fff;
+        }
+
+        .legend {
+            line-height: 20px;
+            font-size: 12px;
+        }
+
+        .legend i {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            vertical-align: middle;
+            opacity: 0.85;
+        }
+
+        .leaflet-popup-content {
+            font-size: 13px;
+        }
+
+        .contrib-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin: 2px 0 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="map"></div>
+        <div id="sidebar">
+            <h1>Heat-Town</h1>
+            <div class="sub">都市熱リスク Jᵢ の可視化 PoC</div>
+
+            <div class="control presets">
+                <label>ペルソナ プリセット</label>
+                <button data-preset="balanced" class="active">一般</button>
+                <button data-preset="elderly">高齢者</button>
+                <button data-preset="commuter">通勤</button>
+                <button data-preset="heat_alert">猛暑日</button>
+            </div>
+
+            <div class="control">
+                <label>w₁ 距離の重み: <span id="w1v" class="val">0.30</span></label>
+                <input type="range" id="w1" min="0" max="1" step="0.05" value="0.3" />
+            </div>
+            <div class="control">
+                <label>w₂ 不快度の重み: <span id="w2v" class="val">0.40</span></label>
+                <input type="range" id="w2" min="0" max="1" step="0.05" value="0.4" />
+            </div>
+            <div class="control">
+                <label>w₃ 暑さの重み: <span id="w3v" class="val">0.30</span></label>
+                <input type="range" id="w3" min="0" max="1" step="0.05" value="0.3" />
+            </div>
+
+            <div class="control legend">
+                <label>凡例（Jᵢ = 低いほど安全）</label>
+                <div id="legend"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
