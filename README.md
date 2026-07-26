@@ -12,7 +12,15 @@ Python でデータを作り、ブラウザ地図で **近くの涼み場 Top 3*
 └─────────────┘                   └──────────────┘                └─────────────┘
 ```
 
-## 10 秒で試す
+## 公開 URL（そのまま開くだけ）
+
+**https://kanshovector.github.io/Heat-Town/?demo=1**
+
+発表・デモ用。有明キャンパス固定・エリア外でも壊れません。
+
+---
+
+## 10 秒でローカル試す（任意）
 
 ```bash
 git clone https://github.com/KanshoVector/Heat-Town.git && cd Heat-Town
@@ -60,15 +68,12 @@ python -m heat_town.cli pipeline --sample   # データ再生成
 | `mvp/public/js/app.js` | 地図 UI・Playground |
 | `vercel.json` | デプロイ時に pipeline 自動実行 |
 
-## デプロイ（Vercel）
+## デプロイ
 
-```bash
-# リポジトリルートで（vercel.json が build 時に GeoJSON を生成）
-npm i -g vercel
-vercel
-```
+**本番（GitHub Pages）**: https://kanshovector.github.io/Heat-Town/?demo=1  
+`main` へ push すると [deploy-pages.yml](.github/workflows/deploy-pages.yml) が自動ビルド・公開。
 
-Root Directory はリポジトリルート、`outputDirectory` は `mvp/public`（[operations.md](docs/operations.md)）。
+Vercel も [vercel.json](vercel.json) で対応可（GitHub 連携または `vercel` CLI）。
 
 ## ドキュメント
 

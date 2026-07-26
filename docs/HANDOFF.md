@@ -19,35 +19,15 @@
 
 ---
 
-## あなたが触る手順
+## 公開 URL
 
-```bash
-cd heat-town
-source .venv/bin/activate
-python -m heat_town.cli pipeline --sample
-cd mvp/public && python -m http.server 8080
-```
+**https://kanshovector.github.io/Heat-Town/?demo=1**
 
-| URL | 用途 |
-|-----|------|
-| http://localhost:8080/ | 通常 |
-| http://localhost:8080/?demo=1 | **発表デモ（推奨）** |
-
-```bash
-pytest   # 33 passed 確認
-```
+ブラウザで開くだけ。コマンド不要。
 
 ---
 
-## Vercel デプロイ
-
-```bash
-npm i -g vercel   # 初回のみ
-vercel            # リポジトリルートで実行
-# 本番 URL + ?demo=1 を QR 化 → Slide 4
-```
-
----
+## ローカル（開発者のみ）
 
 ## ドキュメント入口
 

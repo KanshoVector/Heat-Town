@@ -2,7 +2,7 @@
 
 > **使い方**: 各 Slide をそのまま PowerPoint / Google Slides に転記。  
 > **原稿**は口語そのまま。専門用語は避け、質疑は Q&A カードを参照。  
-> **デモ URL**: ローカル `http://localhost:8080/?demo=1` / Vercel デプロイ後は本番 URL を QR 化
+> **デモ URL**: https://kanshovector.github.io/Heat-Town/?demo=1
 
 ---
 
