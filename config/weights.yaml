@@ -1,0 +1,20 @@
+# Ji = w1*d + w2*(100-C) + w3*WBGT の重みプリセット
+# 制約: w1 + w2 + w3 = 1, wk >= 0
+presets:
+  balanced:      # 一般
+    w1: 0.3
+    w2: 0.4
+    w3: 0.3
+  elderly:       # 高齢者
+    w1: 0.2
+    w2: 0.5
+    w3: 0.3
+  commuter:      # 通勤
+    w1: 0.5
+    w2: 0.2
+    w3: 0.3
+  heat_alert:    # 猛暑日
+    w1: 0.2
+    w2: 0.2
+    w3: 0.6
+default: balanced

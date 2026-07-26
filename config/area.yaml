@@ -1,0 +1,10 @@
+# 対象エリア: 武蔵野大学 有明キャンパス近傍 2km 四方
+name: ariake-2km
+center:
+  latitude: 35.634
+  longitude: 139.790
+size_m: 2000          # 一辺 2km
+grid_spacing_m: 100   # 評価点間隔 → 約 20x20 = 400 点（要件: 500-2000 点の下限近く）
+crs:
+  input: "EPSG:4326"
+  distance: "EPSG:6677"  # 平面直角座標系 IX 系（関東）

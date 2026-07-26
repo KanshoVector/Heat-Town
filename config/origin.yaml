@@ -1,0 +1,6 @@
+# d_i = dist(origin, i) / d_max の origin
+origin:
+  name: "武蔵野大学 有明キャンパス"
+  latitude: 35.634
+  longitude: 139.790
+d_max_m: 1500  # 正規化上限（これ以上は d=1 に cap）
