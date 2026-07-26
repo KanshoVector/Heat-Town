@@ -40,11 +40,12 @@ pip install -e ".[dev]"
 
 | パス | Git |
 |------|-----|
-| `data/samples/` | コミット |
+| `data/samples/` | **.gitignore**（各自 `pipeline --sample`） |
 | `data/raw/` | .gitignore |
-| `data/processed/` | sample のみ |
+| `data/processed/` | .gitignore |
+| `mvp/public/data/` | .gitignore |
 
-乱数 seed: 42。座標 EPSG は config 固定。
+詳細: [adr/003-generated-data-not-in-git.md](adr/003-generated-data-not-in-git.md)
 
 ---
 

@@ -6,8 +6,9 @@
 
 ```bash
 source .venv/bin/activate
+python -m heat_town.cli pipeline --sample
 ls data/samples/weather data/samples/poi data/samples/grid
-# cli 実装前は samples/ をそのまま使って OK
+ls data/processed/features.parquet mvp/public/data/scores.geojson
 ```
 
 ## データの出どころ
@@ -25,29 +26,33 @@ WBGT は気象から **推定** した値（公式観測ではない）。
 
 ```
 data/
-├── samples/      # Git 管理 — 最初はここだけ触る
-├── raw/          # .gitignore — フル取得用
-└── processed/    # パイプライン出力 → features.parquet
+├── samples/      # .gitignore — 各自 pipeline --sample で生成
+├── raw/          # .gitignore — フル取得用（将来）
+└── processed/    # .gitignore — features.parquet
 ```
 
-## パイプライン（cli 実装後）
+`mvp/public/data/scores.geojson` も Git 管理外。クローン直後は **必ず pipeline を 1 回実行** する。
+
+## パイプライン
 
 ```bash
-python -m src.cli fetch-weather --full
-python -m src.cli fetch-poi --full
-python -m src.cli build-grid
-python -m src.cli pipeline --sample   # samples のみ
+python -m heat_town.cli fetch-weather --sample
+python -m heat_town.cli fetch-poi --sample
+python -m heat_town.cli build-grid
+python -m heat_town.cli pipeline --sample
 ```
+
+`--full`（実 API 取得）は未実装。方針は [docs/adr/004-open-data-fetch-strategy.md](../docs/adr/004-open-data-fetch-strategy.md)。
 
 ## 完了の目安
 
-- `data/processed/features.parquet` がある（または samples で分析が回る）
+- `data/processed/features.parquet` と `mvp/public/data/scores.geojson` がある
 - 下表のライセンス帰属を守っている
 
 ## ライセンス
 
 | データ | ライセンス | 帰属 |
 |--------|------------|------|
-| Open-Meteo | [API Terms](https://open-meteo.com/en/terms) | Open-Meteo |
+| Open-Meteo | [API Terms](https://open-meteo.com/en/terms)（データ CC BY 4.0） | Open-Meteo |
 | OpenStreetMap | ODbL 1.0 | © OpenStreetMap contributors |
 | 生成データ | MIT（本 repo） | heat-town |

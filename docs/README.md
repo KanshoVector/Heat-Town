@@ -28,4 +28,5 @@ Git の流れ: [CONTRIBUTING.md](../CONTRIBUTING.md)
 | [social-proposals.md](social-proposals.md) | 社会提言 |
 | [delivery.md](delivery.md) | レポート・発表 |
 | [operations.md](operations.md) | デプロイ・CI（発起人用） |
+| [adr/README.md](adr/README.md) | 設計判断・リスク（ADR） |
 | その他 | 背景・不採用技術など |

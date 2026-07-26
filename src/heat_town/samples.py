@@ -74,9 +74,8 @@ def generate_poi(out_dir: Path) -> Path:
             )
     out = out_dir / "poi" / "poi.geojson"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(
-        json.dumps({"type": "FeatureCollection", "features": features}, ensure_ascii=False, indent=2)
-    )
+    payload = {"type": "FeatureCollection", "features": features}
+    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
     return out
 
 

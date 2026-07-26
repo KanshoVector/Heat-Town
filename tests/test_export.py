@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from heat_town import samples
 from heat_town.export import export_scores_geojson
 from heat_town.preprocess import run_sample
@@ -33,9 +35,17 @@ def test_export_from_features(tmp_path):
         assert key in props
 
 
-def test_export_weights_length_validation(tmp_path):
-    import pytest
+def test_export_weights_normalized(tmp_path):
+    samples.main()
+    features = run_sample(hour=15)
+    out = tmp_path / "scores.geojson"
+    export_scores_geojson(features, output_path=out, weights=(0.6, 0.6, 0.6))
+    props = json.loads(out.read_text())["features"][0]["properties"]
+    w = props["weights"]
+    assert w["w1"] == pytest.approx(w["w2"]) == pytest.approx(w["w3"]) == pytest.approx(1 / 3)
 
+
+def test_export_weights_length_validation(tmp_path):
     with pytest.raises(ValueError):
         export_scores_geojson(
             samples._samples_dir().parent / "processed" / "features.parquet",

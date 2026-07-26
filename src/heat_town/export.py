@@ -9,7 +9,7 @@ from typing import Sequence
 
 import pandas as pd
 
-from heat_town.model import compute_ji, normalize_weights
+from heat_town.model import normalize_weights
 
 
 def _load_feature_data(data: pd.DataFrame | str | Path) -> pd.DataFrame:
@@ -17,22 +17,16 @@ def _load_feature_data(data: pd.DataFrame | str | Path) -> pd.DataFrame:
         return data
 
     path = Path(data)
-    if path.exists():
-        if path.suffix == ".parquet":
-            return pd.read_parquet(path)
-        if path.suffix == ".csv":
-            return pd.read_csv(path)
-        if path.suffix in {".json", ".geojson"}:
-            return pd.read_json(path)
-        raise ValueError(f"Unsupported input format: {path.suffix}")
+    if not path.exists():
+        raise FileNotFoundError(f"Feature file not found: {path}")
 
-    return pd.DataFrame(
-        [
-            {"latitude": 35.1, "longitude": 136.9, "d": 0.2, "C": 70.0, "WBGT": 28.0},
-            {"latitude": 35.2, "longitude": 137.0, "d": 0.5, "C": 40.0, "WBGT": 30.0},
-            {"latitude": 35.15, "longitude": 136.95, "d": 0.3, "C": 60.0, "WBGT": 31.0},
-        ]
-    )
+    if path.suffix == ".parquet":
+        return pd.read_parquet(path)
+    if path.suffix == ".csv":
+        return pd.read_csv(path)
+    if path.suffix in {".json", ".geojson"}:
+        return pd.read_json(path)
+    raise ValueError(f"Unsupported input format: {path.suffix}")
 
 
 def export_scores_geojson(
@@ -50,54 +44,58 @@ def export_scores_geojson(
     output_path:
         Destination GeoJSON file. Defaults to ``mvp/public/data/scores.geojson``.
     weights:
-        Optional 3-tuple of weights ``(w1, w2, w3)``. If omitted, a balanced preset is used.
+        Optional 3-tuple of weights ``(w1, w2, w3)``. Normalized to sum 1 before export.
     """
 
-    data = _load_feature_data(data)
-
-    if not isinstance(data, pd.DataFrame):
-        raise TypeError("data must be a pandas DataFrame or a parquet path")
+    frame = _load_feature_data(data)
 
     if weights is None:
         weights = (0.3, 0.4, 0.3)
     if len(weights) != 3:
         raise ValueError("weights must contain exactly three values")
 
-    w1, w2, w3 = map(float, weights)
-    _ = normalize_weights(w1, w2, w3)
+    w1, w2, w3 = normalize_weights(float(weights[0]), float(weights[1]), float(weights[2]))
 
-    target_path = Path(output_path) if output_path is not None else Path("mvp/public/data/scores.geojson")
+    target_path = (
+        Path(output_path) if output_path is not None else Path("mvp/public/data/scores.geojson")
+    )
     target_path.parent.mkdir(parents=True, exist_ok=True)
 
+    required = {"latitude", "longitude", "d", "C", "WBGT"}
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    lat = frame["latitude"].astype(float)
+    lon = frame["longitude"].astype(float)
+    d = frame["d"].astype(float)
+    comfort = frame["C"].astype(float)
+    wbgt = frame["WBGT"].astype(float)
+
+    distance_contribution = w1 * d
+    discomfort_contribution = w2 * (100.0 - comfort)
+    heat_contribution = w3 * wbgt
+    ji = distance_contribution + discomfort_contribution + heat_contribution
+
     features: list[dict[str, object]] = []
-    for _, row in data.iterrows():
-        latitude = float(row["latitude"])
-        longitude = float(row["longitude"])
-        d = float(row["d"])
-        comfort = float(row["C"])
-        wbgt = float(row["WBGT"])
-
-        ji = compute_ji(d=d, comfort=comfort, wbgt=wbgt, w1=w1, w2=w2, w3=w3)
-        distance_contribution = w1 * d
-        discomfort_contribution = w2 * (100.0 - comfort)
-        heat_contribution = w3 * wbgt
-
+    weight_props = {"w1": w1, "w2": w2, "w3": w3}
+    for i in range(len(frame)):
         features.append(
             {
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [longitude, latitude],
+                    "coordinates": [float(lon.iloc[i]), float(lat.iloc[i])],
                 },
                 "properties": {
-                    "ji": ji,
-                    "distance_contribution": distance_contribution,
-                    "discomfort_contribution": discomfort_contribution,
-                    "heat_contribution": heat_contribution,
-                    "distance": d,
-                    "comfort": comfort,
-                    "wbgt": wbgt,
-                    "weights": {"w1": w1, "w2": w2, "w3": w3},
+                    "ji": float(ji.iloc[i]),
+                    "distance_contribution": float(distance_contribution.iloc[i]),
+                    "discomfort_contribution": float(discomfort_contribution.iloc[i]),
+                    "heat_contribution": float(heat_contribution.iloc[i]),
+                    "distance": float(d.iloc[i]),
+                    "comfort": float(comfort.iloc[i]),
+                    "wbgt": float(wbgt.iloc[i]),
+                    "weights": weight_props,
                 },
             }
         )
@@ -117,7 +115,11 @@ def main() -> None:
     parser.add_argument("--weights", nargs=3, type=float, default=[0.3, 0.4, 0.3])
     args = parser.parse_args()
 
-    output_path = export_scores_geojson(args.input_path, output_path=args.output, weights=tuple(args.weights))
+    output_path = export_scores_geojson(
+        args.input_path,
+        output_path=args.output,
+        weights=tuple(args.weights),
+    )
     print(f"Wrote {output_path}")
 
 

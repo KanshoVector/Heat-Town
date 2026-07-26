@@ -34,12 +34,8 @@ def _load_yaml(name: str) -> dict:
 
 
 def estimate_wbgt(temp: float, rh: float) -> float:
-    """簡易 WBGT 推定（docs/data.md の式）.
-
-    WBGT = 0.735*T + 0.0375*RH + 0.00292*T*RH + 7.85 ... ではなく
-    docs の係数に合わせた近似。0-40℃ にクリップ。
-    """
-    wbgt = 0.735 * temp + 0.0375 * rh + 0.00292 * temp * rh - 4.0
+    """簡易 WBGT 推定（docs/data.md, docs/research.md と同一式）."""
+    wbgt = 0.735 * temp + 0.0375 * rh + 0.00292 * temp * rh + 7.85
     return float(np.clip(wbgt, 0.0, 40.0))
 
 
@@ -52,25 +48,35 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * r * math.asin(math.sqrt(a))
 
 
-def _nearest_poi_dist(lat: float, lon: float, pois: list[dict]) -> float:
-    """最寄り緑・日陰 POI までの距離 (m)。POI 無しは大きめの値。"""
+def _nearest_poi_distances(lats: np.ndarray, lons: np.ndarray, pois: list[dict]) -> np.ndarray:
+    """各グリッド点から最寄り POI までの距離 (m)。ベクトル化で O(N*M) を定数因子削減."""
     if not pois:
-        return 1500.0
-    dists = [_haversine_m(lat, lon, p["lat"], p["lon"]) for p in pois]
-    return min(dists)
+        return np.full(len(lats), 1500.0)
+
+    poi_lats = np.array([p["lat"] for p in pois], dtype=float)
+    poi_lons = np.array([p["lon"] for p in pois], dtype=float)
+
+    lat1 = np.radians(lats)[:, None]
+    lon1 = np.radians(lons)[:, None]
+    lat2 = np.radians(poi_lats)[None, :]
+    lon2 = np.radians(poi_lons)[None, :]
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    dists = 2 * 6_371_000.0 * np.arcsin(np.sqrt(np.clip(a, 0.0, 1.0)))
+    return dists.min(axis=1)
 
 
 def run_sample(hour: int = 15) -> Path:
-    """samples を読み、指定時刻の features.parquet を生成して返す。"""
+    """samples を読み、指定時刻の features.parquet を生成して返す."""
     root = _repo_root()
     samples_dir = root / "data" / "samples"
 
-    # --- config ---
     origin_cfg = _load_yaml("origin.yaml")["origin"]
     d_max = _load_yaml("origin.yaml")["d_max_m"]
     o_lat, o_lon = origin_cfg["latitude"], origin_cfg["longitude"]
 
-    # --- weather（指定時刻の1行を使う）---
     weather = pd.read_csv(samples_dir / "weather" / "weather_hourly.csv", parse_dates=["time"])
     row = weather.loc[weather["time"].dt.hour == hour]
     if row.empty:
@@ -80,43 +86,37 @@ def run_sample(hour: int = 15) -> Path:
     wind = float(row["wind_speed_10m"].iloc[0])
     wbgt = estimate_wbgt(temp, rh)
 
-    # --- POI ---
     poi_geo = json.loads((samples_dir / "poi" / "poi.geojson").read_text())
     pois = [
         {"lat": f["geometry"]["coordinates"][1], "lon": f["geometry"]["coordinates"][0]}
         for f in poi_geo["features"]
     ]
 
-    # --- grid → 特徴量 ---
     grid = pd.read_csv(samples_dir / "grid" / "grid.csv")
-    records = []
-    for _, g in grid.iterrows():
-        lat, lon = g["latitude"], g["longitude"]
+    lats = grid["latitude"].to_numpy(dtype=float)
+    lons = grid["longitude"].to_numpy(dtype=float)
 
-        # 距離 d: origin からの距離を d_max で正規化 [0,1]
-        dist_o = _haversine_m(lat, lon, o_lat, o_lon)
-        d = min(dist_o / d_max, 1.0)
+    dist_o = np.array([_haversine_m(lat, lon, o_lat, o_lon) for lat, lon in zip(lats, lons)])
+    d = np.clip(dist_o / d_max, 0.0, 1.0)
 
-        # 快適度 C: 最寄り緑・日陰が近いほど高い + 風の寄与（docs の α/β/γ 近似）
-        poi_dist = _nearest_poi_dist(lat, lon, pois)
-        c_green = max(0.0, 100.0 - poi_dist / 5.0)      # 500m で 0
-        c_shade = c_green * 0.8
-        c_wind = min(wind / 8.0 * 100.0, 100.0)
-        comfort = float(np.clip(0.4 * c_shade + 0.4 * c_green + 0.2 * c_wind, 0.0, 100.0))
+    poi_dist = _nearest_poi_distances(lats, lons, pois)
+    c_green = np.clip(100.0 - poi_dist / 5.0, 0.0, 100.0)
+    c_shade = c_green * 0.8
+    c_wind = np.clip(wind / 8.0 * 100.0, 0.0, 100.0)
+    comfort = np.clip(0.4 * c_shade + 0.4 * c_green + 0.2 * c_wind, 0.0, 100.0)
 
-        records.append(
-            {
-                "grid_id": g["grid_id"],
-                "latitude": lat,
-                "longitude": lon,
-                "d": round(d, 4),
-                "C": round(comfort, 2),
-                "WBGT": round(wbgt, 2),
-                "hour": hour,
-            }
-        )
+    features = pd.DataFrame(
+        {
+            "grid_id": grid["grid_id"].values,
+            "latitude": lats,
+            "longitude": lons,
+            "d": np.round(d, 4),
+            "C": np.round(comfort, 2),
+            "WBGT": round(wbgt, 2),
+            "hour": hour,
+        }
+    )
 
-    features = pd.DataFrame.from_records(records)
     out = root / "data" / "processed" / "features.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     features.to_parquet(out, index=False)

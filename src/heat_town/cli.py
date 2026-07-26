@@ -47,42 +47,31 @@ def cmd_build_grid(args: argparse.Namespace) -> None:
 
 
 def cmd_pipeline(args: argparse.Namespace) -> None:
-    """samples 生成 → preprocess → export を一気通し。
-
-    preprocess / export は後続タスクで実装される。存在すれば呼び、
-    無ければ該当ステップをスキップして案内を出す（段階的に動く設計）。
-    """
+    """samples 生成 → preprocess → export を一気通し。"""
     if not args.sample:
         raise SystemExit("pipeline は現在 --sample のみ対応です。")
 
     samples.main()
     print("[pipeline] samples 生成完了")
 
-    # --- preprocess（feature/preprocess で実装予定）---
-    try:
-        from heat_town import preprocess  # type: ignore
+    from heat_town import export, preprocess
 
-        out = preprocess.run_sample()
-        print(f"[pipeline] preprocess -> {out}")
-    except ImportError:
-        print("[pipeline] preprocess 未実装のためスキップ（feature/preprocess で追加）")
+    out = preprocess.run_sample()
+    print(f"[pipeline] preprocess -> {out}")
 
-    # --- export（feature/export で実装予定）---
-    try:
-        from heat_town import export
-
-        features = _repo_root() / "data" / "processed" / "features.parquet"
-        if features.exists():
-            out = export.export_scores_geojson(features)
-            print(f"[pipeline] export -> {out}")
-        else:
-            print("[pipeline] features.parquet が無いため export をスキップ")
-    except ImportError:
-        print("[pipeline] export 未実装のためスキップ（feature/export で追加）")
+    features = _repo_root() / "data" / "processed" / "features.parquet"
+    if features.exists():
+        geo = export.export_scores_geojson(features)
+        print(f"[pipeline] export -> {geo}")
+    else:
+        raise SystemExit(f"[pipeline] {features} が見つかりません")
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="heat_town.cli", description="heat-town data pipeline CLI")
+    parser = argparse.ArgumentParser(
+        prog="heat_town.cli",
+        description="heat-town data pipeline CLI",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_weather = sub.add_parser("fetch-weather", help="気象データ取得")

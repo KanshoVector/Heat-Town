@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -29,4 +31,7 @@ def test_fetch_full_not_implemented():
 
 
 def test_pipeline_sample_runs():
-    cli.main(["pipeline", "--sample"])  # preprocess/export 無くても完走する
+    cli.main(["pipeline", "--sample"])
+    scores = Path(__file__).resolve().parents[1] / "mvp" / "public" / "data" / "scores.geojson"
+    assert scores.exists()
+

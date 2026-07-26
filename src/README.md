@@ -13,7 +13,7 @@ J_i = w_1 \cdot d_i + w_2 \cdot (100 - C_i) + w_3 \cdot \text{WBGT}_i
 ```bash
 source .venv/bin/activate          # 未作成なら START.md
 python -c "from heat_town.model import compute_ji; print('OK')"
-# 担当に応じて cli / preprocess / export を実装（下表）
+python -m heat_town.cli pipeline --sample
 ```
 
 ## ファイルと作業
@@ -21,11 +21,14 @@ python -c "from heat_town.model import compute_ji; print('OK')"
 | ファイル | やること |
 |----------|----------|
 | `heat_town/model.py` | \(J_i\) 計算・寄与分解（済） |
-| `cli.py`（未実装） | `fetch-weather`, `pipeline --sample` など |
-| `preprocess.py`（未実装） | parquet 整形 |
-| `export.py`（未実装） | `mvp/public/data/scores.geojson` 出力 |
+| `heat_town/cli.py` | `fetch-weather`, `pipeline --sample` など（済） |
+| `heat_town/preprocess.py` | samples → `features.parquet`（済） |
+| `heat_town/export.py` | `mvp/public/data/scores.geojson` 出力（済） |
+| `heat_town/samples.py` | 決定論的サンプル生成（済） |
 
-データ取得の詳細は [data/README.md](../data/README.md)。
+`d` は **origin（基準点）からの正規化距離**。緑・日陰の近さは快適度 \(C\) に反映される。
+
+データ取得の詳細は [data/README.md](../data/README.md)。設計判断は [docs/adr/README.md](../docs/adr/README.md)。
 
 ## 完了の目安
 
