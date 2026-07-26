@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pip install -r requirements.txt && pip install -e . && python -m heat_town.cli pipeline --sample",
+  "outputDirectory": "mvp/public",
+  "installCommand": "python3 -m pip install --upgrade pip"
+}

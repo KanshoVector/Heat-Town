@@ -59,10 +59,18 @@ def cmd_pipeline(args: argparse.Namespace) -> None:
     out = preprocess.run_sample()
     print(f"[pipeline] preprocess -> {out}")
 
-    features = _repo_root() / "data" / "processed" / "features.parquet"
+    root = _repo_root()
+    features = root / "data" / "processed" / "features.parquet"
+    poi_path = root / "data" / "samples" / "poi" / "poi.geojson"
     if features.exists():
         geo = export.export_scores_geojson(features)
         print(f"[pipeline] export -> {geo}")
+        if poi_path.exists():
+            import pandas as pd
+
+            wbgt = float(pd.read_parquet(features)["WBGT"].iloc[0])
+            rest = export.export_rest_spots_geojson(poi_path, wbgt=wbgt)
+            print(f"[pipeline] rest spots -> {rest}")
     else:
         raise SystemExit(f"[pipeline] {features} が見つかりません")
 

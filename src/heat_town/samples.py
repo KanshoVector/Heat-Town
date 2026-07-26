@@ -55,21 +55,31 @@ def generate_weather(out_dir: Path) -> Path:
     return out
 
 
+_KIND_LABELS = {"park": "公園", "tree": "街路樹", "shade_building": "ビル影"}
+
+
 def generate_poi(out_dir: Path) -> Path:
     """公園・街路樹・建物影の POI（OSM 風 GeoJSON）."""
     rng = np.random.default_rng(SEED)
     kinds = [("park", 6), ("tree", 18), ("shade_building", 8)]
     features = []
+    counters: dict[str, int] = {}
     for kind, n in kinds:
         for _ in range(n):
+            counters[kind] = counters.get(kind, 0) + 1
             dx, dy = rng.uniform(-SIZE_M / 2, SIZE_M / 2, 2)
             lon = CENTER_LON + dx / M_PER_DEG_LON
             lat = CENTER_LAT + dy / M_PER_DEG_LAT
+            label = _KIND_LABELS[kind]
             features.append(
                 {
                     "type": "Feature",
                     "geometry": {"type": "Point", "coordinates": [round(lon, 6), round(lat, 6)]},
-                    "properties": {"kind": kind},
+                    "properties": {
+                        "kind": kind,
+                        "name": f"{label} {counters[kind]}",
+                        "poi_id": f"{kind}_{counters[kind]:02d}",
+                    },
                 }
             )
     out = out_dir / "poi" / "poi.geojson"

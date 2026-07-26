@@ -32,6 +32,9 @@ def test_fetch_full_not_implemented():
 
 def test_pipeline_sample_runs():
     cli.main(["pipeline", "--sample"])
-    scores = Path(__file__).resolve().parents[1] / "mvp" / "public" / "data" / "scores.geojson"
+    root = Path(__file__).resolve().parents[1]
+    scores = root / "mvp" / "public" / "data" / "scores.geojson"
+    rest = root / "mvp" / "public" / "data" / "rest_spots.geojson"
     assert scores.exists()
+    assert rest.exists()
 

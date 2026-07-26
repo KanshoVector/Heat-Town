@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Heat-Town — 都市熱リスク可視化 PoC</title>
+    <title>Heat-Town — 近くの涼み場を探す</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
@@ -17,45 +17,261 @@
         html,
         body {
             height: 100%;
-            font-family: system-ui, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #1a1510;
+            color: #f5f0ea;
         }
 
         #app {
             display: flex;
+            flex-direction: column;
             height: 100vh;
         }
 
-        #map {
-            flex: 1 1 70%;
+        @media (min-width: 768px) {
+            #app {
+                flex-direction: row;
+            }
         }
 
         #sidebar {
-            flex: 0 0 320px;
-            padding: 20px;
-            background: #2b2118;
-            color: #fff;
+            flex: 0 0 auto;
+            max-height: 55vh;
             overflow-y: auto;
+            padding: 16px 18px 20px;
+            background: #2b2118;
+            border-bottom: 1px solid #4a3a2a;
         }
 
-        #sidebar h1 {
+        @media (min-width: 768px) {
+            #sidebar {
+                flex: 0 0 360px;
+                max-height: none;
+                border-bottom: none;
+                border-right: 1px solid #4a3a2a;
+            }
+        }
+
+        #map {
+            flex: 1 1 auto;
+            min-height: 45vh;
+        }
+
+        .brand h1 {
             font-size: 20px;
             color: #ffb03b;
+            margin-bottom: 2px;
+        }
+
+        .brand .tagline {
+            font-size: 12px;
+            color: #b8a090;
+            margin-bottom: 12px;
+        }
+
+        .wbgt-banner {
+            background: linear-gradient(90deg, #e63946 0%, #f4813f 100%);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .wbgt-banner strong {
+            font-size: 15px;
+        }
+
+        .location-banner {
+            background: #4285f4;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .primary-action {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2a9d8f, #238b7e);
+            color: #fff;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .primary-action:hover {
+            opacity: 0.92;
+        }
+
+        .primary-action:active {
+            transform: scale(0.98);
+        }
+
+        .primary-action:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .playground-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .secondary-btn {
+            flex: 1 1 auto;
+            min-width: 140px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #5a4a3a;
+            border-radius: 10px;
+            background: #3a2e22;
+            color: #f5f0ea;
+            cursor: pointer;
+            transition: opacity 0.2s, border-color 0.2s;
+        }
+
+        .secondary-btn:hover {
+            opacity: 0.9;
+            border-color: #ffb03b;
+        }
+
+        .secondary-btn.active {
+            border-color: #2a9d8f;
+            background: #2a9d8f33;
+            color: #7dcea0;
+        }
+
+        #status {
+            font-size: 12px;
+            color: #c9b8a8;
+            margin-bottom: 10px;
+            min-height: 1.2em;
+        }
+
+        .spot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .spot-card {
+            background: #3a2e22;
+            border-radius: 12px;
+            padding: 12px 14px;
+            border-left: 4px solid #2a9d8f;
+        }
+
+        .spot-card.rank-1 {
+            border-left-color: #2a9d8f;
+        }
+
+        .spot-card.rank-2 {
+            border-left-color: #8bc34a;
+        }
+
+        .spot-card.rank-3 {
+            border-left-color: #ffb03b;
+        }
+
+        .spot-card .rank {
+            font-size: 11px;
+            color: #ffb03b;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .spot-card .name {
+            font-size: 15px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
-        #sidebar .sub {
+        .spot-card .meta {
             font-size: 12px;
-            color: #c9a;
-            margin-bottom: 20px;
+            color: #c9b8a8;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .comfort-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #2a9d8f33;
+            color: #7dcea0;
+        }
+
+        .comfort-badge.warn {
+            background: #f4813f33;
+            color: #ffb03b;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: #f4813f;
+            color: #fff;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            font-size: 13px;
+            color: #a89888;
+            padding: 12px;
+            background: #3a2e2244;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        details.analysis-panel {
+            margin-top: 8px;
+            border-top: 1px solid #4a3a2a;
+            padding-top: 12px;
+        }
+
+        details.analysis-panel summary {
+            cursor: pointer;
+            font-size: 13px;
+            color: #ffb03b;
+            font-weight: 600;
+            padding: 6px 0;
+            user-select: none;
+        }
+
+        .analysis-content {
+            padding-top: 12px;
         }
 
         .control {
-            margin-bottom: 22px;
+            margin-bottom: 16px;
         }
 
         .control label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             margin-bottom: 6px;
             color: #ffb03b;
         }
@@ -72,8 +288,8 @@
         .presets button {
             display: inline-block;
             margin: 3px;
-            padding: 6px 10px;
-            font-size: 12px;
+            padding: 5px 9px;
+            font-size: 11px;
             border: 1px solid #f4813f;
             background: transparent;
             color: #f4813f;
@@ -87,18 +303,45 @@
             color: #fff;
         }
 
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+
+        .toggle-row input {
+            width: 16px;
+            height: 16px;
+        }
+
         .legend {
             line-height: 20px;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .legend i {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin-right: 6px;
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
             vertical-align: middle;
             opacity: 0.85;
+        }
+
+        .danger-list {
+            font-size: 12px;
+            color: #ddd;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+
+        .danger-list li {
+            margin-bottom: 4px;
+            list-style: none;
+            padding: 4px 0;
+            border-bottom: 1px solid #4a3a2a44;
         }
 
         .leaflet-popup-content {
@@ -110,43 +353,83 @@
             border-radius: 4px;
             margin: 2px 0 6px;
         }
+
+        .user-marker {
+            background: #4285f4;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #4285f4;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <div id="map"></div>
         <div id="sidebar">
-            <h1>Heat-Town</h1>
-            <div class="sub">都市熱リスク Jᵢ の可視化 PoC</div>
-            <div id="status" class="sub" style="margin-bottom:12px;color:#ddd;"></div>
-
-            <div class="control presets">
-                <label>ペルソナ プリセット</label>
-                <button data-preset="balanced" class="active">一般</button>
-                <button data-preset="elderly">高齢者</button>
-                <button data-preset="commuter">通勤</button>
-                <button data-preset="heat_alert">猛暑日</button>
+            <div class="brand">
+                <h1>Heat-Town</h1>
+                <div class="tagline">近くの涼み場を、3タップで。</div>
             </div>
 
-            <div class="control">
-                <label>w₁ 距離の重み: <span id="w1v" class="val">0.30</span></label>
-                <input type="range" id="w1" min="0" max="1" step="0.05" value="0.3" />
-            </div>
-            <div class="control">
-                <label>w₂ 不快度の重み: <span id="w2v" class="val">0.40</span></label>
-                <input type="range" id="w2" min="0" max="1" step="0.05" value="0.4" />
-            </div>
-            <div class="control">
-                <label>w₃ 暑さの重み: <span id="w3v" class="val">0.30</span></label>
-                <input type="range" id="w3" min="0" max="1" step="0.05" value="0.3" />
-            </div>
+            <div id="wbgt-banner" class="wbgt-banner" hidden></div>
+            <div id="location-banner" class="location-banner" hidden></div>
 
-            <div class="control legend">
-                <label>凡例（Jᵢ = 低いほど安全）</label>
-                <div id="legend"></div>
+            <button id="find-btn" class="primary-action" type="button">
+                📍 現在地から一番近い涼み場を探す
+            </button>
+            <div class="playground-actions">
+                <button id="playground-toggle" class="secondary-btn" type="button">
+                    🕹️ クリック位置を現在地にする
+                </button>
+                <button id="reset-ariake" class="secondary-btn" type="button">
+                    🔄 有明初期位置に戻す
+                </button>
             </div>
+            <div id="status"></div>
+            <div id="spot-list" class="spot-list"></div>
+
+            <details class="analysis-panel">
+                <summary>📊 モデル検証・分析モード（デモ用）</summary>
+                <div class="analysis-content">
+                    <div class="toggle-row">
+                        <input type="checkbox" id="show-grid" />
+                        <label for="show-grid">400点格子ヒートマップ表示</label>
+                    </div>
+
+                    <div class="control presets">
+                        <label>ペルソナ プリセット</label>
+                        <button data-preset="balanced" class="active" type="button">一般</button>
+                        <button data-preset="elderly" type="button">高齢者</button>
+                        <button data-preset="commuter" type="button">通勤</button>
+                        <button data-preset="heat_alert" type="button">猛暑日</button>
+                    </div>
+
+                    <div class="control">
+                        <label>w₁ 距離: <span id="w1v" class="val">0.30</span></label>
+                        <input type="range" id="w1" min="0" max="1" step="0.05" value="0.3" />
+                    </div>
+                    <div class="control">
+                        <label>w₂ 不快度: <span id="w2v" class="val">0.40</span></label>
+                        <input type="range" id="w2" min="0" max="1" step="0.05" value="0.4" />
+                    </div>
+                    <div class="control">
+                        <label>w₃ 暑さ: <span id="w3v" class="val">0.30</span></label>
+                        <input type="range" id="w3" min="0" max="1" step="0.05" value="0.3" />
+                    </div>
+
+                    <div class="control legend">
+                        <label>凡例（Jᵢ = 低いほど安全）</label>
+                        <div id="legend"></div>
+                    </div>
+
+                    <div class="control">
+                        <label>危険点 Top 10（Jᵢ 高い順）</label>
+                        <ol id="danger-list" class="danger-list"></ol>
+                    </div>
+                </div>
+            </details>
         </div>
+        <div id="map"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

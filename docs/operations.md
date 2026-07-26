@@ -53,13 +53,22 @@ pip install -e ".[dev]"
 
 | 項目 | 値 |
 |------|-----|
-| Root | `mvp/` |
-| 方式 | GitHub 連携（main → 自動） |
+| Root | リポジトリルート（`vercel.json` 参照） |
+| 出力 | `mvp/public/` |
+| ビルド | `pipeline --sample` で GeoJSON 生成（ADR-003） |
 | 環境変数 | 不要（静的 GeoJSON） |
 
+ルート `vercel.json`:
+
+```json
+{
+  "buildCommand": "pip install -r requirements.txt && pip install -e . && python -m heat_town.cli pipeline --sample",
+  "outputDirectory": "mvp/public"
+}
+```
+
 ```bash
-cd mvp && npm install && npm run dev   # Next.js 採用時
-cd mvp/public && python -m http.server 8080  # HTML+JS
+cd mvp/public && python -m http.server 8080  # ローカル
 ```
 
 **CD は Actions から行わない**。Vercel ダッシュボードでリポジトリ連携。

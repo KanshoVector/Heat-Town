@@ -13,6 +13,8 @@ heat-town の**実装済み**判断と、残リスクの一覧。学生向け入
 | [004](004-open-data-fetch-strategy.md) | Open-Meteo / OSM 取得方針（2026-07） | 採用 |
 | [005](005-client-side-ji-recompute.md) | クライアント側 Jᵢ 再計算 | 採用 |
 | [006](006-pandas-preprocess-over-duckdb.md) | PoC 前処理は pandas 優先 | 採用 |
+| [007](007-rest-first-ux.md) | Rest-first UX（休憩モード Primary） | 採用 |
+| [008](008-future-extensions.md) | 将来拡張（メッシュ・重み推定） | 提案 |
 
 ## 更新ルール
 
