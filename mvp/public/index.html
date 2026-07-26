@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Heat Town PoC</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+    <script src="js/app.js?v=20260726-1" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0f172a;
+        --panel: rgba(15, 23, 42, 0.92);
+        --panel-soft: rgba(30, 41, 59, 0.72);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #f59e0b;
+        --border: rgba(148, 163, 184, 0.22);
+        --shadow: 0 24px 80px rgba(2, 6, 23, 0.45);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(245, 158, 11, 0.28), transparent 34%),
+          radial-gradient(circle at right top, rgba(56, 189, 248, 0.22), transparent 36%),
+          linear-gradient(160deg, #020617 0%, #111827 48%, #0f172a 100%);
+        color: var(--text);
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        height: 100%;
+      }
+
+      #map {
+        min-height: 100vh;
+      }
+
+      .panel {
+        position: relative;
+        z-index: 1000;
+        margin: 16px 16px 16px 0;
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.8));
+        box-shadow: var(--shadow);
+        overflow: auto;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: var(--accent);
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      .summary {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .status {
+        margin: 0 0 16px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: var(--panel-soft);
+        border: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      .section {
+        margin: 18px 0 0;
+      }
+
+      .section h2 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .preset-grid button {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: rgba(30, 41, 59, 0.76);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        font: inherit;
+        transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      }
+
+      .preset-grid button:hover,
+      .preset-grid button:focus-visible {
+        transform: translateY(-1px);
+        border-color: rgba(245, 158, 11, 0.65);
+        outline: none;
+      }
+
+      .preset-grid button.active {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.34), rgba(251, 191, 36, 0.22));
+        border-color: rgba(245, 158, 11, 0.8);
+      }
+
+      .sliders {
+        display: grid;
+        gap: 14px;
+      }
+
+      .slider label {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .slider output {
+        color: #fbbf24;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider input[type="range"] {
+        width: 100%;
+        accent-color: #f59e0b;
+      }
+
+      .legend {
+        display: grid;
+        gap: 8px;
+      }
+
+      .legend-item {
+        display: grid;
+        grid-template-columns: 18px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .swatch {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
+
+      .note {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .leaflet-popup-content-wrapper,
+      .leaflet-popup-tip {
+        background: rgba(15, 23, 42, 0.96);
+        color: var(--text);
+      }
+
+      .leaflet-popup-content {
+        margin: 14px 16px;
+        min-width: 220px;
+      }
+
+      .popup-title {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      .popup-score {
+        margin: 0 0 10px;
+        color: #fbbf24;
+        font-weight: 700;
+      }
+
+      .popup-lines {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        color: #cbd5e1;
+      }
+
+      .popup-lines span {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      @media (max-width: 920px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        #map {
+          min-height: 58vh;
+        }
+
+        .panel {
+          margin: 0;
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div id="map" aria-label="heat town map"></div>
+      <aside class="panel">
+        <p class="eyebrow">Heat Town PoC</p>
+        <h1>Leaflet で見る J_i</h1>
+        <p class="summary">
+          静的 GeoJSON を読み込み、距離・不快・暑さの寄与をその場で再計算して見せる簡易ビューアです。
+          地点をクリックすると popup で 3 行の内訳を確認できます。
+        </p>
+        <div id="status" class="status">GeoJSON を読み込み中...</div>
+
+        <div class="section">
+          <h2>プリセット</h2>
+          <div class="preset-grid" id="preset-grid"></div>
+        </div>
+
+        <div class="section">
+          <h2>重み</h2>
+          <div class="sliders" id="sliders"></div>
+        </div>
+
+        <div class="section">
+          <h2>凡例</h2>
+          <div class="legend" id="legend"></div>
+        </div>
+
+        <p class="note">
+          データは mvp/public/data/scores.geojson を読む想定です。実運用では src 側の export で差し替えてください。
+        </p>
+      </aside>
+    </div>
+  </body>
+</html>

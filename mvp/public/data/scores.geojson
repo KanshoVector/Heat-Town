@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "芝公園北側",
+        "district": "港区",
+        "d": 0.18,
+        "comfort": 74,
+        "wbgt": 27.2
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.7517, 35.6586]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "上野駅前",
+        "district": "台東区",
+        "d": 0.44,
+        "comfort": 61,
+        "wbgt": 30.1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.7774, 35.7138]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "神保町交差点",
+        "district": "千代田区",
+        "d": 0.31,
+        "comfort": 69,
+        "wbgt": 28.6
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.7571, 35.6952]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "錦糸公園西口",
+        "district": "墨田区",
+        "d": 0.12,
+        "comfort": 79,
+        "wbgt": 26.4
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.815, 35.6995]
+      }
+    }
+  ]
+}
