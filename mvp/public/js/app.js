@@ -297,7 +297,7 @@ function fitMap() {
   }
 
   const bounds = L.latLngBounds(state.features.map((feature) => [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]));
-  state.map.fitBounds(bounds.pad(0.08), { maxZoom: 14 });
+  state.map.fitBounds(bounds.pad(0.08), { maxZoom: 16 });
 }
 
 async function bootstrap() {
