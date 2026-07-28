@@ -29,7 +29,7 @@ python -m heat_town.cli pipeline --sample
 
 `d` は **origin（基準点）からの正規化距離**。緑・日陰の近さは快適度 \(C\) に反映される。
 
-データ取得の詳細は [data/README.md](../data/README.md)。設計判断は [docs/adr/README.md](../docs/adr/README.md)。
+詳細: [docs/PROJECT.md](../docs/PROJECT.md)
 
 ## 完了の目安
 

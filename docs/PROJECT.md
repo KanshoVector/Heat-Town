@@ -1,32 +1,46 @@
-# heat-town — プロジェクト正本（実装準拠）
+# heat-town — プロジェクト正本
 
-> **最終更新**: 2026-07-28  
-> 実装・README・スライド素材の **単一の参照元**。矛盾時は **コード > 本ファイル**。
+> 実装・発表の **唯一の参照元**。矛盾時は **コード > 本ファイル**。
 
 ---
 
 ## 概要
 
-**heat-town** = 猛暑の外勤中に「どこへ逃げればいいか」を、近くの涼み場 Top 3 + Google Maps 徒歩ナビで答える PoC。裏側に説明可能な線形モデル \(J_i\) がある。
+猛暑の外勤中に「どこへ逃げればいいか」を、**涼み場 Top 3 + Google Maps 徒歩ナビ** で答える PoC。裏側に説明可能な線形モデル \(J_i\)。
 
-| 層 | ユーザー | 体験 |
-|----|----------|------|
-| **Primary** | 外勤・現場 | Top 3 涼み場 + Maps ナビ（[ADR-007](adr/007-rest-first-ux.md)） |
-| **Secondary** | PBL 発表・行政 | 400 点格子・重みスライダー・寄与分解 |
+| 層 | 体験 |
+|----|------|
+| **Primary** | Geolocation → Top 3 → Maps ナビ |
+| **Secondary** | 400 点格子・重みスライダー・寄与分解・危険 Top 10 |
 
-**公開 URL**: https://kanshovector.github.io/Heat-Town/?demo=1  
-**本番ホスト**: GitHub Pages（`deploy-pages.yml`）。Vercel も `vercel.json` で可。
+**URL**: https://kanshovector.github.io/Heat-Town/?demo=1  
+**ホスト**: GitHub Pages（`deploy-pages.yml`）。Vercel も `vercel.json` で可。
+
+---
+
+## チーム分担（取り決め）
+
+**フォルダ単位のブロック分担**のみ記録。個人名と担当の対応表はリポジトリに残っていない。
+
+| ブロック | フォルダ | 人数目安 |
+|----------|----------|----------|
+| データ取得・前処理 | `data/`, `src/` cli | 1 |
+| 分析 | `notebooks/` | 2 |
+| モデル・GeoJSON | `src/` | 1 |
+| 地図 PoC | `mvp/` | 1 |
+| 手伝い | 上記のサポート | 1 |
+| 発表・スライド | `docs/` | 発起人 |
+
+コミット履歴上は複数メンバーが存在するが、**誰がどこまでやったかの公式記録はない**。個人レポート等は各自で記述する想定。
 
 ---
 
 ## 対象エリア
 
-- **中心**: 武蔵野大学 有明キャンパス（35.634, 139.790）
-- **評価グリッド**: 2km 四方 · 100m 間隔 · **約 400 点**
-- **サービスエリア**: 半径 1500m。エリア外 / `?demo=1` → 有明補正
-- **涼み場検索**: 800m 以内の POI のみ
-
-`config/origin.yaml` は preprocess が読込。`config/area.yaml` / `weights.yaml` は参照用（コードは定数ハードコード）。
+- 中心: 武蔵野大学 有明キャンパス（35.634, 139.790）
+- 格子: 2km 四方 · 100m 間隔 · **約 400 点**
+- サービスエリア: 半径 1500m（外 / `?demo=1` → 有明補正）
+- 涼み場: **800m 以内** POI のみ
 
 ---
 
@@ -36,102 +50,103 @@
 python -m heat_town.cli pipeline --sample
 ```
 
-| データ | 設計上 | **実装** |
-|--------|--------|----------|
-| 気象 | Open-Meteo | `samples.py` 決定論的 CSV（seed=42） |
-| POI | OSM | `samples.py` GeoJSON **32 点**（公園6・樹18・ビル影8） |
-| グリッド | 内部生成 | `samples.py` 400 点 |
+| データ | 実装 |
+|--------|------|
+| 気象 | `samples.py` 決定論的 CSV（seed=42） |
+| POI | 32 点（公園6・樹18・ビル影8） |
+| グリッド | 400 点 |
 
-- `--full`（実 API）は **未実装**（[ADR-004](adr/004-open-data-fetch-strategy.md)）
-- 前処理: **pandas + haversine**（DuckDB 未使用、[ADR-006](adr/006-pandas-preprocess-over-duckdb.md)）
-- 固定時刻: **hour=15**。時刻切替 UI なし
-- 出力: `data/processed/features.parquet` → `mvp/public/data/*.geojson`（Git 管理外）
+- `--full`（Open-Meteo / OSM 実 API）**未実装**
+- 前処理: **pandas + haversine**（DuckDB 未使用）
+- 固定時刻 hour=15。生成物は Git 管理外 → デプロイ時に自動生成
 
 ---
 
 ## モデル
 
-### 格子評価 \(J_i\)
+### 格子 \(J_i\)（低いほど良い）
 
 \[
 J_i = w_1 d + w_2(100-C) + w_3 \text{WBGT}
 \]
 
-低いほど望ましい。重みプリセット: balanced / elderly / commuter / heat_alert（各 README 参照）。
-
-**WBGT**（全格子同一）: `0.735T + 0.0375RH + 0.00292T·RH + 7.85` — 推定値、公式観測ではない。
+**WBGT**（全格子同一）: `0.735T + 0.0375RH + 0.00292T·RH + 7.85` — 推定値。
 
 **格子の d**: origin からの正規化距離（`d_max=1500m`）。  
-**格子の C**: 最寄り POI 距離 + 風速プロキシ（kind 区別なし）。
+**格子の C**: 最寄り POI 距離 + 風速（kind 区別なし）。
 
 ### 涼み場ランキング（`rest_finder.py`）
 
 ```
 d_norm = min(徒歩距離_m / 800, 1)
-J_i = w₁·d_norm + w₂·(100−C) + w₃·WBGT   ← POI 地点、kind 別 C
+J_i = w₁·d_norm + w₂·(100−C) + w₃·WBGT   ← kind 別 C（park 92 / tree 82 / shade 76 ベース）
 score = 0.6·d_norm + 0.4·(J_i/100)      ← 低いほど良い、Top 3
 ```
+
+### 重みプリセット
+
+| preset | w₁ | w₂ | w₃ |
+|--------|----|----|-----|
+| balanced | 0.3 | 0.4 | 0.3 |
+| elderly | 0.2 | 0.5 | 0.3 |
+| commuter | 0.5 | 0.2 | 0.3 |
+| heat_alert | 0.2 | 0.2 | 0.6 |
+
+ペルソナ事前設定。PCA/AHP 等の自動決定はしていない。
 
 ---
 
 ## フロント（`mvp/public/`）
 
-HTML + Leaflet + 素の JS（Next.js なし）。
+HTML + Leaflet + 素の JS。J_i 再計算はクライアント O(n)（Python/JS 二重管理）。
 
 | 機能 | 説明 |
 |------|------|
-| 📍 現在地 | Geolocation → Top 3 |
-| Top 3 カード | 名称・徒歩・快適度・Maps リンク |
+| Top 3 + Maps | Primary |
 | WBGT バナー | エリア共通推定値 |
-| 🕹️ クリックモード | 仮想現在地 |
-| 📊 分析モード | 400 点色分け（circleMarker）・スライダー・危険 Top 10 |
-
-J_i 再計算はクライアント側 O(n)（[ADR-005](adr/005-client-side-ji-recompute.md)）。Python/JS で式を二重管理。
+| 分析モード | 格子色分け・スライダー・危険 Top 10 |
+| クリックモード | 仮想現在地 |
 
 ---
 
-## 限界（発表で先に言う）
+## 設計判断
 
-| 項目 | 現状 |
-|------|------|
-| 日陰 ray tracing | ❌ POI 位置プロキシ |
-| リアルタイム WBGT/API | ❌ サンプル静的 GeoJSON |
-| 400 点格子 | PoC 固定、理論的根拠なし |
-| 因果主張 | ❌ 相対ランキングのみ |
-| 実 Open-Meteo/OSM | Phase 2 |
+トレードオフ・採否理由の詳細: **[ADR.md](ADR.md)**（数秒で思い出す用）
 
-詳細: [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md)
-
----
-
-## 発表・評価
-
-- **5–6 分スライド**: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)
-- **個人レポート**: [delivery.md](delivery.md)
-- **社会提言**: [social-proposals.md](social-proposals.md)
-- **設計判断**: [ADR.md](ADR.md)
+| 決定 | 理由（一行） |
+|------|-------------|
+| 線形 \(J_i\) | 説明可能性（ML 不採用） |
+| 静的 GeoJSON | サーバーレス、再現性 |
+| Rest-first UX | 現場 JTBD 優先 |
+| `--sample` のみ | 再現性・ライセンス |
+| pandas 前処理 | PoC スコープ優先 |
 
 ---
 
-## ファイル構成
+## 社会提言（分析結果の例）
 
-```
-src/heat_town/     model, preprocess, export, rest_finder, samples, cli
-mvp/public/        index.html, js/app.js, data/*.geojson
-config/            origin.yaml（読込）, area.yaml, weights.yaml（参照）
-notebooks/         EDA・感度分析
-tests/             34 tests
-```
+| ID | 提言 |
+|----|------|
+| P1 | 14–16 時 Cooling Shelter 拡充 |
+| P2 | \(J_i\) top 10% を重点パトロール |
+| P7 | 不快寄与 top 区域へ街路樹 |
+| P8 | 分散型緑 300m 圏 |
+
+※ 数値根拠は notebook 分析に依存。サンプルデータベースである点は [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md) 参照。
 
 ---
 
-## ローカル起動
+## 限界・運用
+
+限界の詳細・Q&A 言い換え: [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md)  
+設計判断・トレードオフ: [ADR.md](ADR.md)  
+発表素材: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)
+
+**ローカル起動**:
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e ".[dev]"
 python -m heat_town.cli pipeline --sample
 cd mvp/public && python -m http.server 8080
-# → http://localhost:8080/?demo=1
-pytest
+pytest   # 34 tests
 ```

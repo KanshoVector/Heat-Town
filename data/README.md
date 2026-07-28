@@ -2,7 +2,7 @@
 
 **現状**: `samples.py` による決定論的サンプル（Open-Meteo/OSM **相当**）。実 API は Phase 2。
 
-詳細: [docs/PROJECT.md](../docs/PROJECT.md) · [docs/data.md](../docs/data.md)
+詳細: [docs/PROJECT.md](../docs/PROJECT.md)
 
 ## 最初の 3 ステップ
 
@@ -30,7 +30,7 @@ mvp/public/data/  scores.geojson, rest_spots.geojson
 
 ## 将来
 
-`fetch-weather --full` / `fetch-poi --full` → [ADR-004](../docs/adr/004-open-data-fetch-strategy.md)
+`fetch-weather --full` / `fetch-poi --full` → 未実装（[PROJECT.md](../docs/PROJECT.md) 参照）
 
 ## ライセンス（実 API 利用時）
 

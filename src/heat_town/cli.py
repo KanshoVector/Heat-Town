@@ -25,7 +25,7 @@ def cmd_fetch_weather(args: argparse.Namespace) -> None:
     if args.full:
         raise SystemExit(
             "fetch-weather --full は未実装です。Open-Meteo API 取得はサンプルで代替してください "
-            "(--sample)。docs/data.md 参照。"
+            "(--sample)。docs/PROJECT.md 参照。"
         )
     path = samples.generate_weather(samples._samples_dir())
     print(f"[fetch-weather] sample -> {path}")
@@ -35,7 +35,7 @@ def cmd_fetch_poi(args: argparse.Namespace) -> None:
     if args.full:
         raise SystemExit(
             "fetch-poi --full は未実装です。OSM Overpass 取得はサンプルで代替してください "
-            "(--sample)。docs/data.md 参照。"
+            "(--sample)。docs/PROJECT.md 参照。"
         )
     path = samples.generate_poi(samples._samples_dir())
     print(f"[fetch-poi] sample -> {path}")

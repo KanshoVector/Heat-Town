@@ -1,6 +1,6 @@
 """Preprocess sample data into a feature table.
 
-Implements the feature engineering described in docs/data.md:
+Implements feature engineering described in docs/PROJECT.md:
 - WBGT estimation from temperature & humidity
 - Comfort C from shade / green / wind proxies
 - Normalized distance d from an origin point
@@ -34,7 +34,7 @@ def _load_yaml(name: str) -> dict:
 
 
 def estimate_wbgt(temp: float, rh: float) -> float:
-    """簡易 WBGT 推定（docs/data.md, docs/research.md と同一式）."""
+    """簡易 WBGT 推定（docs/PROJECT.md と同一式）."""
     wbgt = 0.735 * temp + 0.0375 * rh + 0.00292 * temp * rh + 7.85
     return float(np.clip(wbgt, 0.0, 40.0))
 

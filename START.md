@@ -11,8 +11,7 @@
 | 式 \(J_i\) と GeoJSON 出力 | `src/` | [src/README.md](src/README.md) |
 | 地図で見せる PoC | `mvp/` | [mvp/README.md](mvp/README.md) |
 
-**6 人の目安**: データ 1 + 分析 2 + モデル出力 1 + 地図 1 + 残りは手伝い。  
-発表・スライドは発起人。全体像は [docs/PROJECT.md](docs/PROJECT.md)（任意）。
+**6 人の目安**: データ 1 + 分析 2 + モデル 1 + 地図 1 + 手伝い 1。発表は発起人。詳細: [docs/PROJECT.md](docs/PROJECT.md#チーム分担取り決め)
 
 ## セットアップ（全員・コピペ）
 

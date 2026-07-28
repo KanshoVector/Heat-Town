@@ -153,7 +153,7 @@ pytest
 
 ### Q4. 「データは本物？ サンプルでは？」
 
-**A.** 現在は **`pipeline --sample`** で決定論的サンプルを生成しています。Open-Meteo / OSM 相当の形式ですが、**実 API 取得は Phase 2**（ADR-004）。PBL では再現性とライセンスを優先しました。
+**A.** 現在は **`pipeline --sample`** で決定論的サンプルを生成しています。Open-Meteo / OSM 相当の形式ですが、**実 API 取得は Phase 2**。PBL では再現性とライセンスを優先しました。
 
 ### Q5. 「すずみばと何が違う？」
 
@@ -165,7 +165,7 @@ pytest
 
 ### Q7. 「機械学習で精度を上げないの？」
 
-**A.** **Explainability First** です。線形モデルなら「距離が何点・暑さが何点」と **内訳を見せられる**。ブラックボックスより、行政・市民への **説明** を優先しました（ADR-001）。
+**A.** **Explainability First** です。線形モデルなら「距離が何点・暑さが何点」と **内訳を見せられる**。ブラックボックスより、行政・市民への **説明** を優先しました。
 
 ### Q8. 「因果関係を言える？ 本当に安全？」
 
@@ -187,4 +187,4 @@ pytest
 
 ---
 
-*整合: [PROJECT.md](PROJECT.md) | [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md) | [ADR-007](adr/007-rest-first-ux.md)*
+*整合: [PROJECT.md](PROJECT.md) | [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md)*

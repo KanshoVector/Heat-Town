@@ -1,7 +1,6 @@
-# heat-town — 批判的レビュー（PoC 限界）
+# heat-town — PoC 限界と Q&A 防御
 
-> **最終更新**: 2026-07-28  
-> 実装を正とする。詳細正本: [PROJECT.md](PROJECT.md)
+> 正本: [PROJECT.md](PROJECT.md) · 設計判断: [ADR.md](ADR.md)
 
 ---
 
@@ -9,46 +8,27 @@
 
 | 項目 | 状態 |
 |------|------|
-| 涼み場 Top 3 + Maps ナビ | ✅ Primary UX |
-| エリア外・デモガード | ✅ 1500m 外 / `?demo=1` → 有明補正 |
-| Google Maps 起点固定 | ✅ デモ時は有明→涼み場 |
-| 分析モード（格子・スライダー） | ✅ Secondary UX |
-| Playground（地図クリック） | ✅ |
-| GitHub Pages / Vercel ビルド時 GeoJSON 生成 | ✅ |
-| pytest + ruff | ✅ 34 tests |
-| ADR 000–008 | ✅ |
+| 涼み場 Top 3 + Maps ナビ | ✅ |
+| エリア外・デモガード（1500m / `?demo=1`） | ✅ |
+| 分析モード（格子・スライダー・危険 Top 10） | ✅ |
+| GitHub Pages ビルド時 GeoJSON 生成 | ✅ |
+| pytest 34 / ruff | ✅ |
 
 ---
 
-## PoC 限界（言い訳なし）
+## 限界（言い訳なし）
 
-### データ・モデル
+| カテゴリ | 限界 |
+|----------|------|
+| データ | POI 32 点サンプル、`--full` API 未実装 |
+| WBGT | 推定式・全エリア同一・hour=15 固定 |
+| 快適度 | POI 距離/kind プロキシ。日陰 ray tracing なし |
+| 格子 | 400 点 PoC 固定、理論的根拠なし |
+| モデル | 重みは事前設定、因果主張不可 |
+| UX | 時刻切替なし、有明 2km のみ |
+| 設定 | `area.yaml` / `weights.yaml` 未読込 |
 
-| 限界 | 詳細 |
-|------|------|
-| WBGT 全エリア同一 | 1 時刻（hour=15）固定 |
-| WBGT 推定式 | 公式観測ではない |
-| POI 32 点サンプル | OSM 実データではない |
-| 快適度 C | POI 距離/kind プロキシ。ray tracing なし |
-| 格子前処理 | kind 無視。涼み場のみ kind 別 C |
-| 400 点格子 | 理論的根拠なし |
-| 重み | ペルソナ事前設定。PCA/AHP なし |
-| J_i の d | 格子=origin 距離、涼み場=徒歩/800m |
-| `--full` API | 未実装 |
-
-### UX
-
-| 限界 | 詳細 |
-|------|------|
-| 時刻切替 | 未実装 |
-| leaflet.heat | 未使用（circleMarker） |
-| サービスエリア | 有明 2km のみ |
-
-### 設定
-
-| 限界 | 詳細 |
-|------|------|
-| `area.yaml` / `weights.yaml` | コード未読込（定数ハードコード） |
+**J_i の d の注意**: 格子=origin 距離、涼み場=徒歩/800m（文脈で別）。
 
 ---
 
@@ -57,19 +37,22 @@
 | 避ける | 言い換え |
 |--------|----------|
 | ナイキスト | 100m おき PoC 区切り |
-| 実データ取得済み | サンプルでパイプライン完走、実 API は Phase 2 |
+| 実データ取得済み | サンプルで完走、実 API は Phase 2 |
 | ray tracing | 公園・樹の位置で代用 |
 | 因果・安全保証 | 相対的な休憩候補の優先順位 |
+| ML で精度向上 | 説明可能性優先の線形モデル |
 
 ---
 
-## Phase 3+
+## 想定 Q&A（要点）
 
-1. Open-Meteo / OSM `--full`
-2. variogram メッシュ（ADR-008）
-3. 日陰ルーティング
-4. config YAML のコード読込統一
+| 質問 | 答え |
+|------|------|
+| 日陰の精度は？ | 建物影のリアルタイム計算なし。POI プロキシで候補を順位づけ |
+| 重みの根拠は？ | ペルソナ別事前設定。感度分析で順位変化を示せる |
+| データは本物？ | `pipeline --sample` の決定論的サンプル |
+| すずみばとの違い？ | すずみば型 UX + \(J_i\) で「なぜ」を説明できる PoC |
+| 越谷から動く？ | データは有明のみ。外は有明補正、`?demo=1` 推奨 |
+| ML は？ | Explainability First。寄与分解を優先 |
 
----
-
-*関連: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)*
+詳細原稿: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md) 末尾 Q&A カード

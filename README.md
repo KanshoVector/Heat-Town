@@ -50,7 +50,7 @@ Jᵢ = w₁·距離 + w₂·(100−快適度) + w₃·WBGT   ← 小さいほど
 涼み場スコア = 0.6×(徒歩距離/800m) + 0.4×(Jᵢ/100)
 ```
 
-- **Primary UX**: 現場向け — 涼み場 3 件 + Maps ナビ（[ADR-007](docs/adr/007-rest-first-ux.md)）
+- **Primary UX**: 現場向け — 涼み場 3 件 + Maps ナビ
 - **Secondary UX**: 発表向け — 格子ヒートマップ + 重み変更デモ
 
 ## 開発者向け
@@ -79,11 +79,10 @@ Vercel も [vercel.json](vercel.json) で対応可（GitHub 連携または `ver
 
 | ファイル | 内容 |
 |---------|------|
-| [docs/PROJECT.md](docs/PROJECT.md) | **プロジェクト正本（実装準拠）** |
-| [docs/SLIDE_DECK_MATERIALS.md](docs/SLIDE_DECK_MATERIALS.md) | 5 分発表スライド・原稿・Q&A |
+| [docs/PROJECT.md](docs/PROJECT.md) | プロジェクト正本 |
+| [docs/ADR.md](docs/ADR.md) | 設計判断・トレードオフ |
+| [docs/SLIDE_DECK_MATERIALS.md](docs/SLIDE_DECK_MATERIALS.md) | 5 分発表・原稿・Q&A |
 | [docs/CRITICAL_REVIEW.md](docs/CRITICAL_REVIEW.md) | PoC の限界 |
-| [docs/ADR.md](docs/ADR.md) | 設計判断の索引 |
-| [START.md](START.md) | 1 分入口 |
 
 ## License
 
