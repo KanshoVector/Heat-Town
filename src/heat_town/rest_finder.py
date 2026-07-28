@@ -202,8 +202,8 @@ def find_rest_spots(
 ) -> list[RestSpot]:
     """Return Top-k rest spots sorted by composite score (lower is better).
 
-    Score = 0.6 * (distance_m / max_walk_m) + 0.4 * (ji_score / 100)
-    where ji_score uses ``compute_ji`` with d = distance_m / max_walk_m.
+    Score = 0.6 * (distance_m / max_walk_m) + 0.4 * ji_score
+    where ji_score uses normalized ``compute_ji`` with d = distance_m / max_walk_m.
     """
     if len(weights) != 3:
         raise ValueError("weights must contain exactly three values")
@@ -224,7 +224,7 @@ def find_rest_spots(
         comfort = float(poi.get("comfort", estimate_poi_comfort(poi["kind"], wind)))
         d_norm = min(dist_m / max_walk_m, 1.0)
         ji = compute_ji(d_norm, comfort, wbgt, w1, w2, w3)
-        composite = 0.6 * d_norm + 0.4 * (ji / 100.0)
+        composite = 0.6 * d_norm + 0.4 * ji
         kind = poi["kind"]
         candidates.append(
             RestSpot(

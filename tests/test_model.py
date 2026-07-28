@@ -7,8 +7,13 @@ from heat_town.model import compute_contributions, compute_ji, normalize_weights
 
 def test_compute_ji_balanced_weights():
     j = compute_ji(d=0.2, comfort=70.0, wbgt=28.0, w1=0.3, w2=0.4, w3=0.3)
-    expected = 0.3 * 0.2 + 0.4 * 30.0 + 0.3 * 28.0
+    expected = 0.3 * 0.2 + 0.4 * (30.0 / 100.0) + 0.3 * (28.0 / 40.0)
     assert j == pytest.approx(expected)
+
+
+def test_compute_ji_terms_bounded():
+    j = compute_ji(d=2.0, comfort=-10.0, wbgt=100.0, w1=0.3, w2=0.4, w3=0.3)
+    assert 0.0 <= j <= 1.0
 
 
 def test_lower_ji_is_better_comfort():

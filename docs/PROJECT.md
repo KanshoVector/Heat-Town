@@ -67,20 +67,21 @@ python -m heat_town.cli pipeline --sample
 ### 格子 \(J_i\)（低いほど良い）
 
 \[
-J_i = w_1 d + w_2(100-C) + w_3 \text{WBGT}
+J_i = w_1 d + w_2 \frac{100-C}{100} + w_3 \frac{\text{WBGT}}{40}
 \]
 
-**WBGT**（全格子同一）: `0.735T + 0.0375RH + 0.00292T·RH + 7.85` — 推定値。
+各項は [0,1] に正規化してから加重和（低いほど望ましい）。
 
+**WBGT**（全格子同一）: `0.735T + 0.0375RH + 0.00292T·RH + 7.85` — 推定値（式中は `/40` で正規化）。  
 **格子の d**: origin からの正規化距離（`d_max=1500m`）。  
-**格子の C**: 最寄り POI 距離 + 風速（kind 区別なし）。
+**格子の C**: `0.8·c_green + 0.2·c_wind`（最寄り POI 距離 + 風速）。
 
 ### 涼み場ランキング（`rest_finder.py`）
 
 ```
 d_norm = min(徒歩距離_m / 800, 1)
-J_i = w₁·d_norm + w₂·(100−C) + w₃·WBGT   ← kind 別 C（park 92 / tree 82 / shade 76 ベース）
-score = 0.6·d_norm + 0.4·(J_i/100)      ← 低いほど良い、Top 3
+J_i = w₁·d_norm + w₂·(100−C)/100 + w₃·WBGT/40   ← kind 別 C
+score = 0.6·d_norm + 0.4·J_i                   ← 低いほど良い、Top 3
 ```
 
 ### 重みプリセット

@@ -9,7 +9,7 @@ from typing import Sequence
 
 import pandas as pd
 
-from heat_town.model import normalize_weights
+from heat_town.model import WBGT_SCALE, normalize_weights
 from heat_town.rest_finder import (
     ARIAKE_CENTER_LAT,
     ARIAKE_CENTER_LON,
@@ -83,9 +83,12 @@ def export_scores_geojson(
     comfort = frame["C"].astype(float)
     wbgt = frame["WBGT"].astype(float)
 
-    distance_contribution = w1 * d
-    discomfort_contribution = w2 * (100.0 - comfort)
-    heat_contribution = w3 * wbgt
+    d_n = d.clip(0.0, 1.0)
+    discomfort_n = ((100.0 - comfort) / 100.0).clip(0.0, 1.0)
+    wbgt_n = (wbgt / WBGT_SCALE).clip(0.0, 1.0)
+    distance_contribution = w1 * d_n
+    discomfort_contribution = w2 * discomfort_n
+    heat_contribution = w3 * wbgt_n
     ji = distance_contribution + discomfort_contribution + heat_contribution
 
     features: list[dict[str, object]] = []

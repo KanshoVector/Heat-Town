@@ -101,9 +101,8 @@ def run_sample(hour: int = 15) -> Path:
 
     poi_dist = _nearest_poi_distances(lats, lons, pois)
     c_green = np.clip(100.0 - poi_dist / 5.0, 0.0, 100.0)
-    c_shade = c_green * 0.8
     c_wind = np.clip(wind / 8.0 * 100.0, 0.0, 100.0)
-    comfort = np.clip(0.4 * c_shade + 0.4 * c_green + 0.2 * c_wind, 0.0, 100.0)
+    comfort = np.clip(0.8 * c_green + 0.2 * c_wind, 0.0, 100.0)
 
     features = pd.DataFrame(
         {

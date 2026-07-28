@@ -63,9 +63,19 @@ function haversineM(lat1, lon1, lat2, lon2) {
     return 2 * r * Math.asin(Math.sqrt(Math.min(a, 1)));
 }
 
+const WBGT_SCALE = 40;
+
+function normalizeJiTerms(d, comfort, wbgt) {
+    const dN = Math.max(0, Math.min(d, 1));
+    const discomfortN = Math.max(0, Math.min((100 - comfort) / 100, 1));
+    const wbgtN = Math.max(0, Math.min(wbgt / WBGT_SCALE, 1));
+    return { dN, discomfortN, wbgtN };
+}
+
 function computeJi(d, comfort, wbgt, w) {
     const nw = normalizeWeights(w);
-    return nw.w1 * d + nw.w2 * (100 - comfort) + nw.w3 * wbgt;
+    const { dN, discomfortN, wbgtN } = normalizeJiTerms(d, comfort, wbgt);
+    return nw.w1 * dN + nw.w2 * discomfortN + nw.w3 * wbgtN;
 }
 
 function comfortStatus(comfort) {
@@ -161,7 +171,7 @@ function findRestSpots(userLat, userLon, pois, weights, k = 3, maxWalkM = MAX_WA
         const comfort = Number(props.comfort ?? 70);
         const dNorm = Math.min(distM / maxWalkM, 1);
         const ji = computeJi(dNorm, comfort, wbgt, weights);
-        const score = 0.6 * dNorm + 0.4 * (ji / 100);
+        const score = 0.6 * dNorm + 0.4 * ji;
 
         candidates.push({
             rank: 0,
@@ -223,9 +233,14 @@ function scoreColor(ji, breaks) {
 
 function recompute(props, w) {
     const nw = normalizeWeights(w);
-    const distance = nw.w1 * props.distance;
-    const discomfort = nw.w2 * (100 - props.comfort);
-    const heat = nw.w3 * props.wbgt;
+    const { dN, discomfortN, wbgtN } = normalizeJiTerms(
+        props.distance,
+        props.comfort,
+        props.wbgt
+    );
+    const distance = nw.w1 * dN;
+    const discomfort = nw.w2 * discomfortN;
+    const heat = nw.w3 * wbgtN;
     return { ji: distance + discomfort + heat, distance, discomfort, heat };
 }
 
