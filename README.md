@@ -56,7 +56,7 @@ Jᵢ = w₁·距離 + w₂·(100−快適度) + w₃·WBGT   ← 小さいほど
 ## 開発者向け
 
 ```bash
-pytest                    # 33 tests
+pytest                    # 34 tests
 ruff check src tests
 python -m heat_town.cli pipeline --sample   # データ再生成
 ```
@@ -79,8 +79,9 @@ Vercel も [vercel.json](vercel.json) で対応可（GitHub 連携または `ver
 
 | ファイル | 内容 |
 |---------|------|
-| [docs/SLIDE_DECK_MATERIALS.md](docs/SLIDE_DECK_MATERIALS.md) | **5 分発表スライド・原稿・Q&A** |
-| [docs/CRITICAL_REVIEW.md](docs/CRITICAL_REVIEW.md) | PoC の限界（正直な一覧） |
+| [docs/PROJECT.md](docs/PROJECT.md) | **プロジェクト正本（実装準拠）** |
+| [docs/SLIDE_DECK_MATERIALS.md](docs/SLIDE_DECK_MATERIALS.md) | 5 分発表スライド・原稿・Q&A |
+| [docs/CRITICAL_REVIEW.md](docs/CRITICAL_REVIEW.md) | PoC の限界 |
 | [docs/ADR.md](docs/ADR.md) | 設計判断の索引 |
 | [START.md](START.md) | 1 分入口 |
 

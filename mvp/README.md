@@ -1,13 +1,15 @@
 # 地図 PoC（`mvp/`）
 
-**分析結果を Leaflet で見せる人** が触る。HTML + 静的 GeoJSON だけ。
+**Rest-first UX**: 涼み場 Top 3 + Google Maps ナビ。分析モードは折りたたみ内。
 
-## 最初の 3 ステップ
+詳細: [docs/PROJECT.md](../docs/PROJECT.md)
+
+## 起動
 
 ```bash
+python -m heat_town.cli pipeline --sample   # 初回必須
 cd mvp/public && python -m http.server 8080
-# http://localhost:8080 を開く
-# data/scores.geojson を置き、地図に点が出るか確認
+# http://localhost:8080/?demo=1
 ```
 
 ## 構成
@@ -15,17 +17,14 @@ cd mvp/public && python -m http.server 8080
 ```
 mvp/public/
 ├── index.html
-├── js/
-└── data/scores.geojson   ← src/export の出力
+├── js/app.js
+└── data/
+    ├── scores.geojson      ← 400 点格子
+    └── rest_spots.geojson  ← POI + Top 3
 ```
-
-## 最低限やること
-
-1. GeoJSON を読み込んで地図に色分け表示
-2. 地点クリック → popup に **寄与 3 行**（距離 / 不快 / 暑さ）
-3. （余裕があれば）重みスライダー・`elderly` プリセット
 
 ## 完了の目安
 
-- ローカルで地図 + popup が動く
-- main merge 後、Vercel URL が開く（連携は発起人）
+- [ ] Top 3 カード + Maps リンクが動く
+- [ ] 分析モードで格子 + popup 寄与 3 項
+- [ ] GitHub Pages URL が開く

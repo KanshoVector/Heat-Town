@@ -23,7 +23,8 @@ python -m heat_town.cli pipeline --sample
 | `heat_town/model.py` | \(J_i\) 計算・寄与分解（済） |
 | `heat_town/cli.py` | `fetch-weather`, `pipeline --sample` など（済） |
 | `heat_town/preprocess.py` | samples → `features.parquet`（済） |
-| `heat_town/export.py` | `mvp/public/data/scores.geojson` 出力（済） |
+| `heat_town/export.py` | GeoJSON 出力（済） |
+| `heat_town/rest_finder.py` | 涼み場 Top-k ランキング（済） |
 | `heat_town/samples.py` | 決定論的サンプル生成（済） |
 
 `d` は **origin（基準点）からの正規化距離**。緑・日陰の近さは快適度 \(C\) に反映される。

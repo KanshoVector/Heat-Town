@@ -5,7 +5,7 @@
 
 ## 文脈
 
-`docs/data.md` は DuckDB パイプラインを記述。PBL 実装は `preprocess.py` + pandas のみ。
+`docs/data.md` / [PROJECT.md](../PROJECT.md) は pandas 実装に準拠。
 
 ## 決定
 

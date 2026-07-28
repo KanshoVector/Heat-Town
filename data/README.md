@@ -1,58 +1,40 @@
 # データ（`data/`）
 
-**外部データを取って parquet / geojson に整える人** が触る。
+**現状**: `samples.py` による決定論的サンプル（Open-Meteo/OSM **相当**）。実 API は Phase 2。
+
+詳細: [docs/PROJECT.md](../docs/PROJECT.md) · [docs/data.md](../docs/data.md)
 
 ## 最初の 3 ステップ
 
 ```bash
 source .venv/bin/activate
 python -m heat_town.cli pipeline --sample
-ls data/samples/weather data/samples/poi data/samples/grid
 ls data/processed/features.parquet mvp/public/data/scores.geojson
 ```
 
-## データの出どころ
+## サンプル内容
 
-| データ | 取得元 | 置き場 |
-|--------|--------|--------|
-| 気象・WBGT 推定 | Open-Meteo API | `samples/weather/` |
-| POI（緑・日陰） | OSM Overpass | `samples/poi/` |
-| 評価グリッド | 内部生成 | `samples/grid/` |
+| データ | 点数/件数 | 生成 |
+|--------|-----------|------|
+| 気象 | 24h CSV | 真夏日パターン（hour=15 を使用） |
+| POI | 32 点 | 公園6・樹18・ビル影8 |
+| グリッド | 400 点 | 2km 四方 · 100m 間隔 |
 
-対象エリア: **大学近傍 2km 四方**（`config/area.yaml` 参照）。  
-WBGT は気象から **推定** した値（公式観測ではない）。
-
-## ディレクトリ
+## ディレクトリ（すべて .gitignore）
 
 ```
-data/
-├── samples/      # .gitignore — 各自 pipeline --sample で生成
-├── raw/          # .gitignore — フル取得用（将来）
-└── processed/    # .gitignore — features.parquet
+data/samples/     pipeline --sample で生成
+data/processed/   features.parquet
+mvp/public/data/  scores.geojson, rest_spots.geojson
 ```
 
-`mvp/public/data/scores.geojson` も Git 管理外。クローン直後は **必ず pipeline を 1 回実行** する。
+## 将来
 
-## パイプライン
+`fetch-weather --full` / `fetch-poi --full` → [ADR-004](../docs/adr/004-open-data-fetch-strategy.md)
 
-```bash
-python -m heat_town.cli fetch-weather --sample
-python -m heat_town.cli fetch-poi --sample
-python -m heat_town.cli build-grid
-python -m heat_town.cli pipeline --sample
-```
+## ライセンス（実 API 利用時）
 
-`--full`（実 API 取得）は未実装。方針は [docs/adr/004-open-data-fetch-strategy.md](../docs/adr/004-open-data-fetch-strategy.md)。
-
-## 完了の目安
-
-- `data/processed/features.parquet` と `mvp/public/data/scores.geojson` がある
-- 下表のライセンス帰属を守っている
-
-## ライセンス
-
-| データ | ライセンス | 帰属 |
-|--------|------------|------|
-| Open-Meteo | [API Terms](https://open-meteo.com/en/terms)（データ CC BY 4.0） | Open-Meteo |
-| OpenStreetMap | ODbL 1.0 | © OpenStreetMap contributors |
-| 生成データ | MIT（本 repo） | heat-town |
+| ソース | ライセンス |
+|--------|------------|
+| Open-Meteo | CC BY 4.0 |
+| OpenStreetMap | ODbL 1.0 |

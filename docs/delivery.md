@@ -1,33 +1,12 @@
-# 成果物ガイド（発表・レポート・チーム）
+# 成果物ガイド
 
-## 7 分発表
+## 発表（5–6 分）
 
-### 時間配分（420 秒）
+**正本**: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)（スライド・原稿・Q&A）
 
-| 秒 | 内容 | スライド |
-|----|------|----------|
-| 0–30 | タイトル | 1 |
-| 30–90 | 社会課題 | 2 |
-| 90–180 | データ | 3 |
-| 180–270 | モデル \(J_i\) | 4 |
-| 270–330 | 分析・デモ | 5 |
-| 330–390 | 提言 | 6 |
-| 390–420 | まとめ | 7 |
+デモ URL: https://kanshovector.github.io/Heat-Town/?demo=1
 
-### 台本（抜粋）
-
-**0:00** 「heat-town は距離・快適度・WBGT を統合し、どこを優先的に涼しくすべきか支援する PoC です。」
-
-**3:00** 「\(J_i = w_1 d + w_2(100-C) + w_3 \text{WBGT}\)。線形なので寄与が見えます。」
-
-**6:30** 「GitHub と Vercel URL を共有します。」
-
-### 想定 Q&A
-
-| 質問 | 回答 |
-|------|------|
-| なぜ ML しない？ | Explainability / PBL スコープ → [rejected-approaches.md](rejected-approaches.md) |
-| WBGT 正確？ | 推定値。相対比較用 |
+限界は Slide 5 で先に述べる → [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md)
 
 ---
 
@@ -47,32 +26,13 @@ AI 利用は付録で開示。チーム doc の丸写し禁止。
 
 ---
 
-## チームワークフロー
+## チーム分担
 
-### 分担（参考）
+[START.md](../START.md) · [PROJECT.md](PROJECT.md) 参照。
 
 | ブロック | フォルダ |
 |----------|----------|
-| データ | [data.md](data.md), `data/`, `src/` |
-| 分析 ×2 | [analysis.md](analysis.md), `notebooks/` |
-| モデル出力 | [decision-model.md](decision-model.md), `src/` |
-| 地図 | [mvp.md](mvp.md), `mvp/` |
-
-発表は発起人。詳細: [START.md](../START.md)
-
-### 2〜3 日スケジュール
-
-| Day | 重点 | 成果物 |
-|-----|------|--------|
-| 1 | データ・モデル | features.parquet |
-| 2 | 分析・PoC | scores.geojson, 提言 v1 |
-| 3 | CI・発表 | Actions 緑, レポート |
-
-### 成果物チェックリスト
-
-- [ ] 各フォルダ README の「完了の目安」を満たしている
-- [ ] PoC で地図 + 寄与 popup が動く
-- [ ] Vercel URL
-- [ ] 個人レポート
-
-コミュニケーション: GitHub Issues / PR
+| データ | `data/`, `src/` |
+| 分析 ×2 | `notebooks/` |
+| モデル出力 | `src/` |
+| 地図 | `mvp/` |

@@ -20,7 +20,7 @@
 | R-07 | セキュリティ | Leaflet CDN 改ざん | XSS/供給網 | SRI 付与（index.html） | 完全オフライン bundle は未 |
 | R-08 | セキュリティ | popup HTML 注入 | XSS | `escapeHtml`（app.js） | 外部 GeoJSON 取込時も同関数必須 |
 | R-09 | 運用 | scores.geojson 未生成で Vercel 空地図 | デモ失敗 | README + status UI + pipeline 必須 | デプロイ前チェックリスト |
-| R-10 | 運用 | docs と実装の乖離 | 学生混乱 | ADR + README 更新 | DuckDB 本格パイプラインは未 |
+| R-10 | 運用 | docs と実装の乖離 | 学生混乱 | [PROJECT.md](../PROJECT.md) 正本化 | 解消済み（2026-07-28） |
 | R-11 | 計算量 | N 点 × M POI 最近傍 | 前処理遅延 | numpy ベクトル化（~400×32） | 1 万点超は spatial index |
 | R-12 | 計算量 | export iterrows | 大規模で遅い | PoC N≈400 で許容 | 完全 vectorize GeoJSON 生成 |
 | R-13 | エッジケース | 重み合計 0 | NaN / 除算 | normalize で balanced fallback | export は ValueError |

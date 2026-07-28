@@ -1,6 +1,6 @@
 # Architecture Decision Records — 索引（誠実版）
 
-heat-town の**実装済み**設計判断の入口。詳細は [adr/](adr/) 配下の各 ADR を参照。
+正本: [PROJECT.md](PROJECT.md)
 
 > **注意**: 本プロジェクトは PoC です。ナイキスト・シャノン采样定理や PCA による重み自動決定など、**未実装の理論を主張しません**。
 
@@ -10,7 +10,7 @@ heat-town の**実装済み**設計判断の入口。詳細は [adr/](adr/) 配�
 |----|----------|------|
 | [001](adr/001-linear-decision-model.md) | 線形多目的モデル Jᵢ | 説明可能性 First。重みはペルソナ事前設定 |
 | [002](adr/002-static-geojson-poc.md) | 静的 GeoJSON + Leaflet | サーバーレス配信 |
-| [003](adr/003-generated-data-not-in-git.md) | 生成データは Git 外 | Vercel ビルド時に pipeline 実行 |
+| [003](adr/003-generated-data-not-in-git.md) | 生成データは Git 外 | GitHub Pages / Vercel ビルド時に pipeline 実行 |
 | [004](adr/004-open-data-fetch-strategy.md) | Open-Meteo / OSM 方針 | PBL は `--sample` |
 | [005](adr/005-client-side-ji-recompute.md) | クライアント側 Jᵢ 再計算 | 重み変更を即時反映 |
 | [006](adr/006-pandas-preprocess-over-duckdb.md) | pandas 前処理 | PoC スコープ優先 |

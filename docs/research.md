@@ -42,7 +42,7 @@ C_i = \alpha C_{\text{shade}} + \beta C_{\text{green}} + \gamma C_{\text{wind}},
 
 | 授業要件 | 対応 |
 |----------|------|
-| 7 分発表 | [delivery.md](delivery.md) |
+| 5–6 分発表 | [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md) |
 | 個人レポート | [delivery.md](delivery.md) |
 | 社会課題 | [social-challenge.md](social-challenge.md) |
 | MVP で十分 | [mvp.md](mvp.md) |
@@ -52,8 +52,8 @@ C_i = \alpha C_{\text{shade}} + \beta C_{\text{green}} + \gamma C_{\text{wind}},
 
 | 工程 | 実装 | ドキュメント |
 |------|------|--------------|
-| データ収集 | Open-Meteo, OSM | [data.md](data.md) |
-| 前処理 | Pandas + DuckDB | [data.md](data.md) |
+| データ収集 | サンプル（将来 Open-Meteo/OSM） | [data.md](data.md) |
+| 前処理 | pandas + haversine | [data.md](data.md) |
 | 特徴量 | \(d, C, WBGT\) | [data.md](data.md) |
 | 意思決定モデル | \(J_i\) | [decision-model.md](decision-model.md) |
 | 分析・可視化 | 感度分析 + Leaflet | [analysis.md](analysis.md) |

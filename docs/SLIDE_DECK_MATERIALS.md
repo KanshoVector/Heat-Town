@@ -187,4 +187,4 @@ pytest
 
 ---
 
-*整合: [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md) | [ADR-007](adr/007-rest-first-ux.md) | [README](../README.md)*
+*整合: [PROJECT.md](PROJECT.md) | [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md) | [ADR-007](adr/007-rest-first-ux.md)*

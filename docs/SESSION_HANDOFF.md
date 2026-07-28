@@ -1,19 +1,13 @@
 # heat-town セッション引き継ぎ
 
-> **最終更新**: 2026-07-27 — **最終完成**  
-> 短版: [HANDOFF.md](HANDOFF.md)
-
----
+> **最終更新**: 2026-07-28 · 正本: [PROJECT.md](PROJECT.md)
 
 ## 状態: 完成
 
-- pytest **33 passed**
-- Primary UX（涼み場 Top 3 + Maps）+ Secondary（分析モード）+ Playground
-- Vercel ビルド / デモガード / Google Maps 起点固定
-- プレゼン: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)
-- 限界: [CRITICAL_REVIEW.md](CRITICAL_REVIEW.md)
-
----
+- pytest **34 passed**
+- Primary UX（Top 3 + Maps）+ Secondary（分析モード）+ Playground
+- GitHub Pages 本番 / Vercel 代替
+- 発表: [SLIDE_DECK_MATERIALS.md](SLIDE_DECK_MATERIALS.md)
 
 ## クイック起動
 
@@ -24,7 +18,5 @@ cd mvp/public && python -m http.server 8080
 # → http://localhost:8080/?demo=1
 pytest
 ```
-
----
 
 *Show destinations, not datasets.*
